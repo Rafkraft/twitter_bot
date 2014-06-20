@@ -39,13 +39,6 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True
 )
 
-class PrintEnvironmentHandler(webapp2.RequestHandler):
-    def get(self):
-        for name in os.environ.keys():
-            self.response.out.write("%s = %s<br />\n" % (name, os.environ[name]))
-
-
-
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         from tweepy import API
@@ -97,7 +90,7 @@ class MainHandler(webapp2.RequestHandler):
             else:
                 mail_taken_active = True
 
-
+        #Add user
         if pseudo_taken_active and mail_taken_active:
             users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitterUsername,) )
             for res in users:
@@ -107,6 +100,13 @@ class MainHandler(webapp2.RequestHandler):
                 res.firstName = firstName
                 res.timestamp=now
                 res.put()
+
+            #confirmation message 
+            template = JINJA_ENVIRONMENT.get_template('templates/template.html')
+            templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
+            self.response.write(template.render(templateVars) )
+            sendMail(email,twitterUsername,firstName,admin_mail,hashtag)
+
 
         else:            
             self.user = User(
@@ -118,14 +118,12 @@ class MainHandler(webapp2.RequestHandler):
                 active=True
             )
             self.user.put()
-        
 
-        #confirmation message 
-        template = JINJA_ENVIRONMENT.get_template('templates/template.html')
-        templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
-        self.response.write(template.render(templateVars) )
-
-        sendMail(email,twitterUsername,firstName,admin_mail,hashtag)
+            #confirmation message 
+            template = JINJA_ENVIRONMENT.get_template('templates/template.html')
+            templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
+            self.response.write(template.render(templateVars) )
+            sendMail(email,twitterUsername,firstName,admin_mail,hashtag)
 
 
 def sendMail(email,twitterUsername,firstName,admin_mail,hashtag):
@@ -141,8 +139,7 @@ def sendMail(email,twitterUsername,firstName,admin_mail,hashtag):
 
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler),
-    ('/variables', PrintEnvironmentHandler)
+    ('/', MainHandler)
 ], debug=True)
 
 
