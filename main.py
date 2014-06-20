@@ -58,6 +58,10 @@ class MainHandler(webapp2.RequestHandler):
         hashtag = os.environ['hashtag']
         website_name = os.environ['website_name']
 
+        #
+        pseudo_taken_active = False
+        mail_taken_active = False
+
 
         #Get variables from post
         date1 = int( self.request.get('date1') )
@@ -72,33 +76,48 @@ class MainHandler(webapp2.RequestHandler):
         #verify twitter pseudo is not taken
         users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitterUsername,) )
         for res in users:
-            print 'your username already exists'
+            print 'your username is already taken'
             if res.active:
                 template = JINJA_ENVIRONMENT.get_template('templates/template.html')
                 templateVars = { "message" : "There's already an account with this twitter username"}
                 self.response.write(template.render(templateVars) )
                 return
-
+            else:
+                pseudo_taken_active = True
 
         #verify twitter mail is not taken
         mails = db.GqlQuery("SELECT * FROM User WHERE mail ='%s'" %(email,) )
         for res in mails:
             if res.active:
-                print 'your mail already exists'
+                print 'your mail is already taken'
                 template = JINJA_ENVIRONMENT.get_template('templates/template.html')
                 templateVars = { "message" : "There's already an account with this mail adress"}
                 self.response.write(template.render(templateVars) )
                 return
+            else:
+                mail_taken_active = True
 
-        # send user infos to database
-        self.user = User(
-            lastName=lastName,
-            firstName=firstName,
-            twitterUsername=twitterUsername,
-            mail=email,
-            timestamp=now
-        )
-        self.user.put()
+
+        if pseudo_taken_active and mail_taken_active:
+            users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitterUsername,) )
+            for res in users:
+                res.active = True
+                res.mail=email
+                res.lastName = lastName
+                res.firstName = firstName
+                res.timestamp=now
+                res.put()
+
+        else:            
+            self.user = User(
+                lastName=lastName,
+                firstName=firstName,
+                twitterUsername=twitterUsername,
+                mail=email,
+                timestamp=now,
+                active=True
+            )
+            self.user.put()
         
 
         #confirmation message 

@@ -23,10 +23,10 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True
 )
 
-ckey ='XXXXXX'
-csecret ='XXXXX'
-atoken ='XXXXXXX'
-asecret ='XXXXXXX'
+ckey ='XXXX'
+csecret ='XXXX'
+atoken ='XXXX'
+asecret ='XXXXX'
 
 auth=tweepy.OAuthHandler(ckey,csecret)
 auth.set_access_token(atoken,asecret)

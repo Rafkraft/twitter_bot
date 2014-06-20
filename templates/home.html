@@ -21,24 +21,23 @@ $( document ).ready(function() {
 
 </head>
 <body>
-
-<form method="post"> 
-<label>Nom</label><br><input id="lastName" name="lastName" /><br>
-<label>Prénom</label><br><input id="firstName" name="firstName" /><br>
-<label>Pseudo Twitter</label><br>@<input id="twitterUsername" name="twitterUsername" /><br>
-
-<label>Date de naissance</label><br>
- <select name="date1" id="date1">
-</select> 
- <select name="date2" id="date2">
-</select> 
- <select name="date3" id="date3">
-</select> <br>
-<label>Mail</label><br><input id="mail" name="mail" /><br>
-
-<input type="submit">
-
-</form>
+<div id="content">
+    <form method="post"> 
+        <label>Last Name</label><br><input id="lastName" name="lastName" /><br>
+        <label>First Name</label><br><input id="firstName" name="firstName" /><br>
+        <label>Twitter username</label><br>@<input id="twitterUsername" name="twitterUsername" /><br>
+        <label>Date of birth</label><br>
+         <select name="date1" id="date1">
+        </select> 
+         <select name="date2" id="date2">
+        </select> 
+         <select name="date3" id="date3">
+        </select> <br>
+        <label>Mail adress</label><br><input id="mail" name="mail" /><br>
+        <input type="submit">
+    </form>
+<a href="/unsubscribe">Unsubscribe</a>
+</div>
 
 
 </body>

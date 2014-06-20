@@ -53,11 +53,14 @@ class Unsubscribe(webapp2.RequestHandler):
         email=self.request.get('mail')
         twitterUsername = self.request.get('twitterUsername')
 
+        found = False
+
         template = JINJA_ENVIRONMENT.get_template('templates/template.html')
 
         #get pseudo
         users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitterUsername) )
         for res in users:
+            found = True
             if res.mail==email:
                 if not res.active:
                     #already deactivated                   
@@ -76,6 +79,11 @@ class Unsubscribe(webapp2.RequestHandler):
                 templateVars = { "message" : "there is no match between the twitter username and the email adress"}
                 self.response.write(template.render(templateVars) )
                 return
+
+        if not found:
+            templateVars = { "message" : "there is no profile linked to this username"}
+            self.response.write(template.render(templateVars) )
+
 
 def sendMail(email,twitterUsername,firstName):
     message = mail.EmailMessage(sender="Admin <%s>"%(os.environ['admin_mail']), subject="Account unactivated")
