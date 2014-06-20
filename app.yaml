@@ -8,6 +8,10 @@ env_variables:
   admin_mail: 'yourmail'
   hashtag: 'hashtag'
   website_name: 'website'
+  ckey: 'XXXXX'
+  csecret: 'XXXX'
+  atoken: 'XXXXXX'
+  asecret: 'XXXX'
 
 
 handlers:
