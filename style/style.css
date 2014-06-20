@@ -1,0 +1,33 @@
+body {
+    position: relative;
+}
+form {
+    height:320px;
+    width:280px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10vh;
+    padding:60px;
+    background-color: #EEE;
+    border:4px solid #BBB;
+    border-radius: 3px;
+
+}
+form input {
+    padding:8px;
+    width:180px;
+    margin-bottom: 20px;
+    border: none;
+}
+form select {
+    margin-bottom: 20px;
+}
+form input:last-of-type {
+    background-color: #09F;
+    color:#FFF;
+    cursor: pointer;
+    width:100px;
+}
+form input:last-of-type:hover {
+    background-color: #07D;
+}

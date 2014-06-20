@@ -1,0 +1,40 @@
+application: yourappname
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+env_variables:
+  admin_mail: 'yourmail'
+  hashtag: 'hashtag'
+  website_name: 'website'
+
+
+handlers:
+- url: /style
+  static_dir: style
+
+- url: /checkTweets
+  script: checkTweets.app
+
+- url: /unsubscribe
+  script: unsubscribe.app
+
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+- url: .*
+  script: main.app
+
+
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+- name: jinja2
+  version: latest
+- name: ssl
+  version: latest
+
+

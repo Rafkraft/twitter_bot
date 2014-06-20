@@ -1,0 +1,4 @@
+cron:
+- description: check new tweets
+  url: /checkTweets
+  schedule: every 5 mins
