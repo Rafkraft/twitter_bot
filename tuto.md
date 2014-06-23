@@ -71,11 +71,15 @@ Pour utiliser l'api twitter, il est nécessaire d'avoir déclaré les clés qui 
 
 ### Récupération des tweets
 
+![image](http://s4.postimg.org/3wv9jyujx/recup_tweets.png)
+
 La première fonction qui s'exécute est TweetHandler, qui récupère le hashtag à chercher parmi le fil de tweets, et exécute la fonction getTweets.
 
 La fonction getTweets utilise la fonction Tweepy api.search(), qui va retourner la liste des tweets contenant la variable hashtag définie dans le fichier app.yaml, la fonction analyseTweet() est exécutée pour chaque tweet trouvé.
 
 ### Analyse des tweets
+
+![image](http://s3.postimg.org/sfhpjz01f/analyse_tweets.png)
 
 On récupère d'abord les variables d'environnement et les attributs du tweet qui vont nous être utiles.
 
@@ -106,6 +110,8 @@ On ajoute l'opération dans le datastore, la commande est alors traitée.
 ## Cron.yaml
 
 À chaque fois que la page /checkTweets est sollicitée, un scan des tweets via l'api twitter est fait, nous allons maintenant automatiser cette tâche grâce au programme cron.
+
+![image](http://s3.postimg.org/sfhpjz01f/analyse_tweets.png)
 
 Il est très facile de configurer ce fichier: nommer la tâche, signaler l'url qui doit être chargé puis définir la fréquence, ici les tweets seront donc scannés toutes les 5 minutes.
 
