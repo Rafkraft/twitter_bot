@@ -31,17 +31,20 @@ La première fonction exécutée au sein de la classe MainHandler est la fonctio
 Une fois le formulaire rempli, et le bouton pressé c'est la fonction post qui est sollicitée, elle se divise en trois étapes:
 
 ### **\#verify twitter pseudo is not taken**
--vérification que le pseudonyme n'est pas utilisé:
-    - si il l'est et que le compte est actif, un message d'erreur est envoyé.
-    - si il l'est et que le compte est inactif, le compte est activé et les données mises à jour.
+*-vérification que le pseudonyme n'est pas utilisé:
+
+    * &nbsp;&nbsp;&nbsp; - si il l'est et que le compte est actif, un message d'erreur est envoyé.
+    
+    * &nbsp;&nbsp;&nbsp; - si il l'est et que le compte est inactif, le compte est activé et les données mises à jour.
 
 ### **\#verify twitter mail is not taken**
--vérification que le mail n'est pas utilisé:
-    - si il l'est et que le compte est actif, un message d'erreur est envoyé.
-    - si il l'est et que le compte est inactif, le compte est activé et les données mises à jour.
+* -vérification que le mail n'est pas utilisé:
+    * &nbsp;&nbsp;&nbsp; - si il l'est et que le compte est actif, un message d'erreur est envoyé.
+    * &nbsp;&nbsp;&nbsp; - si il l'est et que le compte est inactif, le compte est activé et les données mises à jour.
 
 ### **\#Add user**
--Si ni le mail ni le pseudo n'est utilisé, un nouvel utilisateur est créé.
+
+* -Si ni le mail ni le pseudo n'est utilisé, un nouvel utilisateur est créé.
 
 Un mail de confirmation est envoyé après l'ajout de l'utilisateur, via la fonction sendMail()
 
