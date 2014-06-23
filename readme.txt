@@ -1,4 +1,5 @@
 
+Rename app_public.yaml to app.yaml
 
 
 In the app.yaml file, add:
