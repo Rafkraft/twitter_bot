@@ -52,8 +52,8 @@ class MainHandler(webapp2.RequestHandler):
         website_name = os.environ['website_name']
 
         #
-        pseudo_taken_active = False
-        mail_taken_active = False
+        pseudo_taken = False
+        mail_taken = False
 
 
         #Get variables from post
@@ -66,34 +66,21 @@ class MainHandler(webapp2.RequestHandler):
         firstName=self.request.get('firstName')
         now = datetime.datetime(date3,date2,date1)
 
+        #template
+        template = JINJA_ENVIRONMENT.get_template('templates/template.html')
+
         #verify twitter pseudo is not taken
         users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitterUsername,) )
         for res in users:
+            pseudo_taken = True
             print 'your username is already taken'
             if res.active:
-                template = JINJA_ENVIRONMENT.get_template('templates/template.html')
+                print 'profile active'
                 templateVars = { "message" : "There's already an account with this twitter username"}
                 self.response.write(template.render(templateVars) )
                 return
             else:
-                pseudo_taken_active = True
-
-        #verify twitter mail is not taken
-        mails = db.GqlQuery("SELECT * FROM User WHERE mail ='%s'" %(email,) )
-        for res in mails:
-            if res.active:
-                print 'your mail is already taken'
-                template = JINJA_ENVIRONMENT.get_template('templates/template.html')
-                templateVars = { "message" : "There's already an account with this mail adress"}
-                self.response.write(template.render(templateVars) )
-                return
-            else:
-                mail_taken_active = True
-
-        #Add user
-        if pseudo_taken_active and mail_taken_active:
-            users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitterUsername,) )
-            for res in users:
+                print 'profile not active'
                 res.active = True
                 res.mail=email
                 res.lastName = lastName
@@ -101,14 +88,29 @@ class MainHandler(webapp2.RequestHandler):
                 res.timestamp=now
                 res.put()
 
-            #confirmation message 
-            template = JINJA_ENVIRONMENT.get_template('templates/template.html')
-            templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
-            self.response.write(template.render(templateVars) )
-            sendMail(email,twitterUsername,firstName,admin_mail,hashtag)
+        #verify twitter mail is not taken
+        mails = db.GqlQuery("SELECT * FROM User WHERE mail ='%s'" %(email,) )
+        for res in mails:
+            mail_taken = True
+            print 'your mail is already taken'
+            if res.active:
+                print 'profile active'   
+                templateVars = { "message" : "There's already an account with this mail adress"}
+                self.response.write(template.render(templateVars) )
+                return
+            else:
+                print 'profile not active'
+                res.active = True
+                res.twitterUsername = twitterUsername
+                res.lastName = lastName
+                res.firstName = firstName
+                res.timestamp=now
+                res.put()
+                templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
+                self.response.write(template.render(templateVars) )
 
-
-        else:            
+        #Add user
+        if not pseudo_taken and not mail_taken:
             self.user = User(
                 lastName=lastName,
                 firstName=firstName,
@@ -118,9 +120,10 @@ class MainHandler(webapp2.RequestHandler):
                 active=True
             )
             self.user.put()
+            templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
+            self.response.write(template.render(templateVars) )
 
             #confirmation message 
-            template = JINJA_ENVIRONMENT.get_template('templates/template.html')
             templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
             self.response.write(template.render(templateVars) )
             sendMail(email,twitterUsername,firstName,admin_mail,hashtag)
@@ -130,7 +133,7 @@ def sendMail(email,twitterUsername,firstName,admin_mail,hashtag):
     message = mail.EmailMessage(sender="Admin <%s>"%(admin_mail,), subject="Inscription")
     message.to = "%s <%s>"%(twitterUsername,email)
     message.body = """
-        Hi '%s'
+        Hi %s
 
         Thanks for your subscription, you can now use the %s functionnality, see you soon
     """ % (firstName,hashtag)

@@ -50,7 +50,6 @@ class Unsubscribe(webapp2.RequestHandler):
     def post(self):
 
         #Get variables from post
-        email=self.request.get('mail')
         twitterUsername = self.request.get('twitterUsername')
 
         found = False
@@ -61,25 +60,18 @@ class Unsubscribe(webapp2.RequestHandler):
         users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitterUsername) )
         for res in users:
             found = True
-            if res.mail==email:
-                if not res.active:
-                    #already deactivated                   
-                    templateVars = { "message" : 'you account is already deactivated'}
-                    self.response.write(template.render(templateVars) )
-                else:
-                    #now deactivated
-                    print 'correspondance'
-                    res.active=False
-                    res.put()
-                    templateVars = { "message" : 'you account has been deactivated'}
-                    self.response.write(template.render(templateVars) )
-                    sendMail(res.mail,res.twitterUsername,res.firstName)
-            else:
-                #no match between mail and username
-                templateVars = { "message" : "there is no match between the twitter username and the email adress"}
+            if not res.active:
+                #already deactivated                   
+                templateVars = { "message" : 'you account is already deactivated'}
                 self.response.write(template.render(templateVars) )
-                return
-
+            else:
+                #now deactivated
+                print 'correspondance'
+                res.active=False                    
+                res.put()
+                templateVars = { "message" : 'you account has been deactivated'}
+                self.response.write(template.render(templateVars) )
+                sendMail(res.mail,res.twitterUsername,res.firstName)
         if not found:
             templateVars = { "message" : "there is no profile linked to this username"}
             self.response.write(template.render(templateVars) )
