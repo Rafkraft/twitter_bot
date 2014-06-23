@@ -32,18 +32,15 @@ Une fois le formulaire rempli, et le bouton pressé c'est la fonction post qui e
 
 ### **\#verify twitter pseudo is not taken**
 
-* vérification que le pseudonyme n'est pas utilisé:
-
-    * &nbsp;&nbsp;&nbsp; si il l'est et que le compte est actif, un message d'erreur est envoyé.
-
-    * &nbsp;&nbsp;&nbsp; si il l'est et que le compte est inactif, le compte est activé et les données mises à jour.
+* Vérification que le pseudonyme n'est pas utilisé:
+    * &nbsp;&nbsp;&nbsp; Si il l'est et que le compte est actif, un message d'erreur est envoyé.
+    * &nbsp;&nbsp;&nbsp; Si il l'est et que le compte est inactif, le compte est activé et les données mises à jour.
 
 ### \#verify twitter mail is not taken
 
-* -vérification que le mail n'est pas utilisé:
-
-    * &nbsp;&nbsp;&nbsp; si il l'est et que le compte est actif, un message d'erreur est envoyé.
-    * &nbsp;&nbsp;&nbsp; si il l'est et que le compte est inactif, le compte est activé et les données mises à jour.
+* Vérification que le mail n'est pas utilisé:
+    * &nbsp;&nbsp;&nbsp; Si il l'est et que le compte est actif, un message d'erreur est envoyé.
+    * &nbsp;&nbsp;&nbsp; Si il l'est et que le compte est inactif, le compte est activé et les données mises à jour.
 
 ### **\#Add user**
 
@@ -67,6 +64,8 @@ L'utilisateur n'est jamais vraiment désinscrit, son compte est seulement désac
 C'est le script qui va réaliser des requêtes envers l'api twitter, récupérer les tweets, identifier l'auteur, le comparer avec la base de donnée du datastore.
 
 ### Identification auprès de l'api twitter
+
+![image](http://s9.postimg.org/4sez7y2e7/Capture_d_e_cran_2014_06_23_a_11_55_01.png)
 
 Pour utiliser l'api twitter, il est nécessaire d'avoir déclaré les clés qui nous identifient auprès de l'api, les variables doivent être déclarée dans le fichier de configuration app.yaml, le script CheckTweets.py ne fait que récupérer les variables d'environnement.
 
