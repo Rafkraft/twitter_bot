@@ -42,7 +42,7 @@ def analyseTweet(tweet):
     hashtag = os.environ['hashtag']
     website_name = os.environ['website_name']   
 
-    # Variables   
+    # Tweet variables   
     date_tweet = tweet.created_at
     twitter_username = tweet._json['user']['name']
     tweet_id = tweet.id
@@ -52,6 +52,7 @@ def analyseTweet(tweet):
     user = None
     user_mail = False
 
+    # determine if user exists
     users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitter_username) )
 
     for res in users:
@@ -71,6 +72,7 @@ def analyseTweet(tweet):
 
     print "The user exists, great "
 
+    #determine if operation has already been treated
     operations = db.GqlQuery("SELECT * FROM Operation WHERE tweet_id =%s" %(478835117641957376) )
     for operation in operations:
         print 'tweet has already been taken into consideration'
@@ -108,6 +110,7 @@ def analyseTweet(tweet):
     today = datetime.datetime.today()
     print today
 
+    #Confirmation mail
     message = mail.EmailMessage(sender="Admin <%s>"%(admin_mail),
     subject="%s new command"%(hashtag))
     message.to = "%s <%s>" %(user_firstName,user_mail)
@@ -117,6 +120,7 @@ def analyseTweet(tweet):
     message.send()
     mail_sent = True
 
+    #add the operation to the datastore
     operation = Operation(
         tweet_id=int(tweet_id),
         tweet_message = tweet_message,
@@ -144,7 +148,6 @@ class TweeterHandler(webapp2.RequestHandler):
     def get(self):
         looking_for = os.environ['hashtag']
         getTweet(looking_for)
-
         self.response.write('checking tweets')
 
 app = webapp2.WSGIApplication([

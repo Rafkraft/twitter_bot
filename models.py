@@ -19,5 +19,3 @@ class Operation(db.Model):
     timestamp=db.DateTimeProperty() # Creation Date
     date = db.DateTimeProperty() # Tweet Date
     user = db.ReferenceProperty(User)
-
-

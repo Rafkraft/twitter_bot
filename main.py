@@ -87,8 +87,11 @@ class MainHandler(webapp2.RequestHandler):
                 res.firstName = firstName
                 res.timestamp=now
                 res.put()
+                templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
+                self.response.write(template.render(templateVars) )
+                sendMail(email,twitterUsername,firstName,admin_mail,hashtag)
 
-        #verify twitter mail is not taken
+        #verify mail is not taken
         mails = db.GqlQuery("SELECT * FROM User WHERE mail ='%s'" %(email,) )
         for res in mails:
             mail_taken = True
@@ -108,6 +111,7 @@ class MainHandler(webapp2.RequestHandler):
                 res.put()
                 templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
                 self.response.write(template.render(templateVars) )
+                sendMail(email,twitterUsername,firstName,admin_mail,hashtag)
 
         #Add user
         if not pseudo_taken and not mail_taken:
@@ -120,12 +124,10 @@ class MainHandler(webapp2.RequestHandler):
                 active=True
             )
             self.user.put()
+
             templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
             self.response.write(template.render(templateVars) )
 
-            #confirmation message 
-            templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
-            self.response.write(template.render(templateVars) )
             sendMail(email,twitterUsername,firstName,admin_mail,hashtag)
 
 
