@@ -4,7 +4,7 @@ Si vous n'avez pas entendu parler de \#AmazonCart, c'est une fonctionnalité lan
 
 Le but de ce tutoriel sera de construire un script semblable en python, nous y ajouterons une fonctionnalité permettant aux utilisateurs de déterminer une taille avec le hashtag \#Taille_M par exemple. 
 
-Nous utiliserons pour cela la plateforme de développement et d'hébergement d'application Google App Engine qui nous simplifieras le travail, notamment pour ce qui concerne la base de donnée.
+Nous utiliserons pour cela la plateforme de développement et d'hébergement d'application Google App Engine qui nous simplifiera le travail, notamment pour la gestion de la base de donnée.
 
 La première étape consiste à construire le formulaire qui permet aux utilisateurs d'entrer leurs informations (compte twitter et email sont celles qui nous intéressent le plus). Grâce à cette correspondance, nous pourrons identifier l’émetteur du tweet contenant le hashtag #Modizy_Bot et ajouter l'article en question au panier du compte Amazon, Modizy ou autre.
 
