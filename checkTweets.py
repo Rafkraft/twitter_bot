@@ -10,12 +10,15 @@ import jinja2
 import datetime
 import tweepy
 
+
 from google.appengine.api import mail
 from google.appengine.api import users
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
 
 from models import Operation
+
+from addToCart import addToCart
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -34,20 +37,22 @@ auth.set_access_token(atoken,asecret)
 api = tweepy.API(auth)
 
 
-
 def analyseTweet(tweet):
 
     #env variables
     admin_mail = os.environ['admin_mail']
     hashtag = os.environ['hashtag']
-    website_name = os.environ['website_name']   
+    website_name = os.environ['website_name'] 
+    application_name = os.environ['application_name'] 
 
     # Tweet variables   
     date_tweet = tweet.created_at
-    twitter_username = tweet._json['user']['name']
+    twitter_username = tweet._json['user']['screen_name']
     tweet_id = tweet.id
     tweet_message =  tweet.text
-    mail_sent = False            
+    mail_sent = False         
+
+    print twitter_username
 
     user = None
     user_mail = False
@@ -56,6 +61,7 @@ def analyseTweet(tweet):
     users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitter_username) )
 
     for res in users:
+
         user_exists = True
         user = res
         user_mail = res.mail
@@ -73,7 +79,7 @@ def analyseTweet(tweet):
     print "The user exists, great "
 
     #determine if operation has already been treated
-    operations = db.GqlQuery("SELECT * FROM Operation WHERE tweet_id =%s" %(478835117641957376) )
+    operations = db.GqlQuery("SELECT * FROM Operation WHERE tweet_id =%s" %(tweet_id) )
     for operation in operations:
         print 'tweet has already been taken into consideration'
         return
@@ -120,6 +126,10 @@ def analyseTweet(tweet):
     message.send()
     mail_sent = True
 
+    AddFunction=addToCart()
+    AddFunction.add(52,"connect@yahoo.fr", "Florian", "Poullin") 
+
+
     #add the operation to the datastore
     operation = Operation(
         tweet_id=int(tweet_id),
@@ -145,6 +155,7 @@ def getTweet(search_term, periods = 60*60*24):
 
 
 class TweeterHandler(webapp2.RequestHandler):
+    #add to cart
     def get(self):
         looking_for = os.environ['hashtag']
         getTweet(looking_for)

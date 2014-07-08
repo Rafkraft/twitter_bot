@@ -113,7 +113,7 @@ On ajoute l'opération dans le datastore, la commande est alors traitée.
 
 ![image](http://s3.postimg.org/sfhpjz01f/analyse_tweets.png)
 
-Il est très facile de configurer ce fichier: nommer la tâche, signaler l'url qui doit être chargé puis définir la fréquence, ici les tweets seront donc scannés toutes les 5 minutes.
+Il est très facile de configurer ce fichier: nommer la tâche, renseigner l'url du script qui doit être executé puis définir la fréquence, ici les tweets seront donc scannés toutes les 5 minutes.
 
 
 

@@ -146,16 +146,3 @@ def sendMail(email,twitterUsername,firstName,admin_mail,hashtag):
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
 ], debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
