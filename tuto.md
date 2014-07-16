@@ -42,7 +42,7 @@ Dans l'exemple ci-dessous, la requête est envoyée depuis un serveur node en ut
     *message_auth: résultat du hashing en sha1 de la chaîne de caractère toCompose contenant toutes les variables envoyées (de manière à signer la requête)
     *timestamp: variable de temps
 
-<code>
+<pre>
 var timestamp = Math.round(+new Date()/1000);
 
 var toCompose = [mail, firstName, lastName, twitterUsername, date1, date2, date3, timestamp];
@@ -66,7 +66,7 @@ request({
 }, function(error, response, body) {
     console.log(body);
 });
-</code>
+</pre>
 
 À la réception, c'est la fonction post au sein de la classe addUser qui s'exécute:
 
