@@ -30,7 +30,7 @@ Avec google app engine, les tables sont des attributs de l'objet db, on les déf
 
 Comme vous pouvez le voir dans les routes (handlers dans le fichier app.yaml) c'est le fichier main.py qui est sollicité par défaut, cependant c'est dans le fichier addUser.py que nous allons gérer les requêtes POST reçues et ainsi ajouter nos utilisateurs au programme #Modizy_Bot.
 
-* Dans l'exemple ci-dessous, la requête est envoyée depuis un serveur node en utilisant le module request.js, l'important est quelle contienne les informations suivantes: dans l'ordre:
+* Dans l'exemple ci-dessous, la requête est envoyée depuis un serveur node en utilisant le module request.js, l'important est quelle contienne les informations suivantes:
     * twitterUsername: Pseudonyme Twitter (la majuscule doit être respectée)
     * lastName: Nom de famille
     * firstName: Prénom
@@ -78,7 +78,7 @@ Les variables sont récupérées, rien d'incroyable jusque là
 Le hashing est réalisé à nouveau avec les variables récupérées, on fait appel à la variable d'environnement PRIVATE_CRYPTO_KEY, bien gardée dans le fichier app.yaml, puis, on compare la variable obtenue (message_auth) et la variable issue du hashing à l'emission (recieved_crypto), si elles diffèrent, un message d'erreur est envoyé et l'éxecution s'arrête.
 
 
-### \#verify twitter mail is not taken
+### \#Verify twitter mail is not taken
 
 On vérifie que l'adresse mail reçue n'est pas déjà associée à un compte dans le datastore:
     *Si c'est le cas, les données sont mises à jour et aucun nouveau compte n'est créé.
@@ -134,11 +134,11 @@ La fonction getTweets utilise la fonction Tweepy api.search(), qui va retourner 
 
 On récupère d'abord les variables d'environnement et les attributs du tweet qui vont nous être utiles.
 
-### \#determine if user exists
+### \#Determine if user exists
 
 On recherche une correspondance entre l'auteur du tweet et notre base de donnée GAE, si aucune correspondance n'est trouvée, un message d'erreur est envoyé.
 
-### \#determine if operation has already been treated
+### \#Determine if operation has already been treated
 
 Si une correspondance est bien trouvée, on peut lancer l'opération, une vérification est faite pour savoir si le tweet, identifié par son id unique, n'a pas déjà été traité.
 
@@ -162,7 +162,7 @@ On envoie un mail de confirmation.
 
 On envoie un tweet de confirmation.
 
-### \#add the operation to the datastore
+### \#Add the operation to the datastore
 
 On ajoute l'opération dans le datastore, de manière à ce qu'elle ne soit pas executée à nouveau au prochain scan. La commande est alors traitée.
 

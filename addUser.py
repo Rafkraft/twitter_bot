@@ -72,7 +72,6 @@ class addUser(webapp2.RequestHandler):
         timestamp=self.request.get('timestamp')
         recieved_crypto = self.request.get('message_auth')
 
-
         #Hash data using the secret_key defined in app.yaml
         secret_key = os.environ['PRIVATE_CRYPTO_KEY']
 

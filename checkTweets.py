@@ -40,13 +40,13 @@ api = tweepy.API(auth)
 
 def analyseTweet(tweet):
 
-    #env variables
+    #Env variables
     admin_mail = os.environ['admin_mail']
     hashtag = os.environ['hashtag']
     website_name = os.environ['website_name'] 
     application_name = os.environ['application_name'] 
 
-    # Tweet variables   
+    #Tweet variables   
     date_tweet = tweet.created_at
     twitter_username = tweet._json['user']['screen_name']
     tweet_id = tweet.id
@@ -111,6 +111,7 @@ def analyseTweet(tweet):
     print "user_lastName : "
     print user_lastName
 
+    #Passing data to the Iceberg API
     add_to_cart(product_id,user_mail,user_firstName,user_lastName)
 
     confirmations(product_url,user_mail,user_firstName,user_lastName,tweet_id,tweet_message,product_id,size,date_tweet,user)
@@ -138,11 +139,11 @@ def confirmations(product_url,user_mail,user_firstName,user_lastName,tweet_id,tw
     message.send()
     mail_sent = True
 
-    #obtain today's date
+    #Obtain today's date
     today = datetime.datetime.today()
     print today
 
-    #add the operation to the datastore
+    #Add the operation to the datastore
     operation = Operation(
         tweet_id=int(tweet_id),
         tweet_message = tweet_message,
