@@ -12,22 +12,27 @@ env_variables:
   csecret: 'XXXX'
   atoken: 'XXXXXX'
   asecret: 'XXXX'
+  PRIVATE_CRYPTO_KEY: 'XXXXXXX'
 
 
 handlers:
+
+- url: /CartHandler
+  script: CartHandler.app
+
 - url: /style
   static_dir: style
 
 - url: /checkTweets
   script: checkTweets.app
 
-- url: /unsubscribe
-  script: unsubscribe.app
+- url: /addUser
+  script: addUser.app
 
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
-
+  
 - url: .*
   script: main.app
 
