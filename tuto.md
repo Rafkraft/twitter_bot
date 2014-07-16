@@ -1,17 +1,16 @@
 ## Twitter_bot
 
-Si vous n'avez pas entendu parler de  , c'est une fonctionnalité lancée par amazon permettant aux utilisateurs de twitter d'ajouter un produit à leur panier amazon directement depuis le fil d'actualité twitter, simplement en tweetant #AmazonCart en réponse à un tweet du compte officiel AmazonCart contenant un lien vers un produit amazon.
+Si vous n'avez pas entendu parler de #AmazonCart , c'est une fonctionnalité lancée par amazon permettant aux utilisateurs de Twitter d'ajouter un produit à leur panier amazon directement depuis le fil d'actualité, simplement en tweetant #AmazonCart en réponse à un tweet du compte officiel AmazonCart contenant un lien vers un produit amazon.
 
 Le but de ce tutoriel sera de construire un script semblable en python, nous y ajouterons une fonctionnalité permettant aux utilisateurs de déterminer une taille avec le hashtag \#Taille_M par exemple. 
 
 Nous utiliserons pour cela la plateforme de développement et d'hébergement d'application Google App Engine qui nous simplifiera le travail, notamment pour la gestion de la base de donnée.
 
-La première étape consiste à construire le formulaire qui permet aux utilisateurs d'entrer leurs informations (compte twitter et email sont celles qui nous intéressent le plus). Grâce à cette correspondance, nous pourrons identifier l’émetteur du tweet contenant le hashtag #Modizy_Bot et ajouter l'article en question au panier du compte Amazon, Modizy ou autre.
 
-Le tutoriel se divisera en trois étapes:
-*L'ajout des utilisateurs à la base de donnée (appelée datastore), et l'enregistrement des informations dont nous auront besoin: mail, nom, prénom et pseudonyme twitter. Ces informations nous permettront, de faire le lien entre l'auteur du tweet trouvés et le compte utilisateur sur notre utilisant la technologie Iceberg. Nous pourront ainsi intervenir sur son pannier via l'api Iceberg.
-*Le scan périodique des tweets grâce à l'api twitter, l'identification de l'auteur et du compte Iceberg associé.
-*L'ajout de l'article au pannier de l'utilisateur via l'api Iceberg.
+* Le tutoriel se divisera en trois étapes:
+    * L'ajout des utilisateurs à la base de donnée (appelée datastore), et l'enregistrement des informations dont nous auront besoin: mail, nom, prénom et pseudonyme twitter. Ces informations nous permettront, de faire le lien entre l'auteur du tweet trouvés et le compte utilisateur sur notre utilisant la technologie Iceberg. Nous pourront ainsi intervenir sur son pannier via l'api Iceberg.
+    * Le scan périodique des tweets grâce à l'api twitter, l'identification de l'auteur et du compte Iceberg associé.
+    * L'ajout de l'article au pannier de l'utilisateur via l'api Iceberg.
 
 ### Prérequis
 
@@ -31,16 +30,16 @@ Avec google app engine, les tables sont des attributs de l'objet db, on les déf
 
 Comme vous pouvez le voir dans les routes (handlers dans le fichier app.yaml) c'est le fichier main.py qui est sollicité par défaut, cependant c'est dans le fichier addUser.py que nous allons gérer les requêtes POST reçues et ainsi ajouter nos utilisateurs au programme #Modizy_Bot.
 
-Dans l'exemple ci-dessous, la requête est envoyée depuis un serveur node en utilisant le module request.js, l'important est quelle contienne les informations suivantes: dans l'ordre:
-    *twitterUsername: Pseudonyme Twitter (la majuscule doit être respectée)
-    *lastName: Nom de famille
-    *firstName: Prénom
-    *mail: Adresse email
-    *date1: Jour de naissance
-    *date2: Mois de naissance
-    *date3: Année de naissance 
-    *message_auth: résultat du hashing en sha1 de la chaîne de caractère toCompose contenant toutes les variables envoyées (de manière à signer la requête)
-    *timestamp: variable de temps
+* Dans l'exemple ci-dessous, la requête est envoyée depuis un serveur node en utilisant le module request.js, l'important est quelle contienne les informations suivantes: dans l'ordre:
+    * twitterUsername: Pseudonyme Twitter (la majuscule doit être respectée)
+    * lastName: Nom de famille
+    * firstName: Prénom
+    * mail: Adresse email
+    * date1: Jour de naissance
+    * date2: Mois de naissance
+    * date3: Année de naissance 
+    * message_auth: résultat du hashing en sha1 de la chaîne de caractère toCompose contenant toutes les variables envoyées (de manière à signer la requête)
+    * timestamp: variable de temps
 
 <pre>
 var timestamp = Math.round(+new Date()/1000);
@@ -130,7 +129,7 @@ La première fonction qui s'exécute est TweetHandler, qui récupère le hashtag
 
 La fonction getTweets utilise la fonction Tweepy api.search(), qui va retourner la liste des tweets contenant la variable hashtag définie dans le fichier app.yaml, la fonction analyseTweet() est exécutée pour chaque tweet trouvé.
 
-### Analyse des tweets
+### fonction analyseTweet(tweet)
 
 
 On récupère d'abord les variables d'environnement et les attributs du tweet qui vont nous être utiles.
