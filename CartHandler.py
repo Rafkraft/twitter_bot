@@ -21,8 +21,7 @@ def add_to_cart(id,email,first_name,last_name):
     logging.basicConfig(level=logging.DEBUG)
 
     api_handler = IcebergAPI()
-    #api_hander = IcebergAPI(username = "rafkraft", access_token = "593aab9b65cfbad5a34951cf1b94769f6fb7bfb3")
-    #api_hander.sso(email = "connect@yahoo.fr", first_name="Florian", last_name="Poullin")
+
     api_handler.sso(email, first_name, last_name)
 
     user_cart = api_handler.Cart.mine()

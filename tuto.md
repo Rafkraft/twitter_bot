@@ -70,11 +70,11 @@ request({
 
 À la réception, c'est la fonction post au sein de la classe addUser qui s'exécute:
 
-### **\#Get variables from post
+### \#Get variables from post
 
 Les variables sont récupérées, rien d'incroyable jusque là
 
-### **\#Hash data using the secret_key defined in app.yaml
+### \#Hash data using the secret_key defined in app.yaml
 
 Le hashing est réalisé à nouveau avec les variables récupérées, on fait appel à la variable d'environnement PRIVATE_CRYPTO_KEY, bien gardée dans le fichier app.yaml, puis, on compare la variable obtenue (message_auth) et la variable issue du hashing à l'emission (recieved_crypto), si elles diffèrent, un message d'erreur est envoyé et l'éxecution s'arrête.
 
@@ -94,13 +94,37 @@ C'est le script qui va réaliser des requêtes envers l'api twitter, récupérer
 
 ### Identification auprès de l'api twitter
 
-![image](http://s9.postimg.org/4sez7y2e7/Capture_d_e_cran_2014_06_23_a_11_55_01.png)
+<pre>
+    ckey =os.environ['ckey']
+    csecret =os.environ['csecret']
+    atoken =os.environ['atoken']
+    asecret =os.environ['asecret']
+
+    auth=tweepy.OAuthHandler(ckey,csecret)
+    auth.set_access_token(atoken,asecret)
+
+    api = tweepy.API(auth)
+</pre>
 
 Pour utiliser l'api twitter, il est nécessaire d'avoir déclaré les clés qui nous identifient auprès de l'api, les variables doivent être déclarée dans le fichier de configuration app.yaml, le script CheckTweets.py ne fait que récupérer les variables d'environnement.
 
 ### Récupération des tweets
 
-![image](http://s4.postimg.org/3wv9jyujx/recup_tweets.png)
+<pre>
+def getTweet(search_term, periods = 60*60*24):
+    results = api.search(q=search_term, rpp=periods)
+    for tweet in results:
+        print '1 tweet found'
+        analyseTweet(tweet)
+
+    return results
+
+class TweeterHandler(webapp2.RequestHandler):
+    def get(self):
+        looking_for = os.environ['hashtag']
+        getTweet(looking_for)
+        self.response.write('checking tweets')
+</pre>
 
 La première fonction qui s'exécute est TweetHandler, qui récupère le hashtag à chercher parmi le fil de tweets, et exécute la fonction getTweets.
 
@@ -108,13 +132,12 @@ La fonction getTweets utilise la fonction Tweepy api.search(), qui va retourner 
 
 ### Analyse des tweets
 
-![image](http://s3.postimg.org/sfhpjz01f/analyse_tweets.png)
 
 On récupère d'abord les variables d'environnement et les attributs du tweet qui vont nous être utiles.
 
 ### \#determine if user exists
 
-On recherche une correspondance entre l'auteur du tweet et notre base de donnée, si aucune correspondance n'est trouvée, un message d'erreur est envoyé.
+On recherche une correspondance entre l'auteur du tweet et notre base de donnée GAE, si aucune correspondance n'est trouvée, un message d'erreur est envoyé.
 
 ### \#determine if operation has already been treated
 
@@ -122,29 +145,70 @@ Si une correspondance est bien trouvée, on peut lancer l'opération, une vérif
 
 ### \#Obtain url from parent tweet
 
-On récupère l'url présent dans le tweet parent, dans notre cas nous en extrayons l'id du produit en question. 
+On récupère l'url présent dans le tweet parent, dans notre cas nous extrayons avec la fonction split l'id du produit en question.
 
-### \#Obtain size id there is one
+### \#Obtain size if there is one
 
-On récupère la taille: tout ce qui se trouve après l'underscore dans le hashtag #Taille_      si il existe.
+On récupère la taille: tout ce qui se trouve après l'underscore dans le hashtag #Taille_      si il existe. Puis ont transmet les arguments nécéssaires à la fonction suivante: confirmation qui va confirmer l'opératio auprès de l'utilisateur par mail et twitter.
+
+### \#Passing data to the Iceberg API
+
+On exécute la fonction add_to_cart avec les quatre attributs dont elle a besoin: id du product à ajouter au pannier, mail, nom et prénom de l'utilisateur.
 
 ### \#Confirmation mail
 
-On envoie un tweet de confirmation, on envoie un mail de confirmation. 
+On envoie un mail de confirmation. 
+
+### \#Confirmation Tweet
+
+On envoie un tweet de confirmation.
 
 ### \#add the operation to the datastore
 
-On ajoute l'opération dans le datastore, la commande est alors traitée.
+On ajoute l'opération dans le datastore, de manière à ce qu'elle ne soit pas executée à nouveau au prochain scan. La commande est alors traitée.
+
+## CartHandler
+
+Nous passons maintenant à l'utilisation de l'API python Iceberg, solicitée par la fonction add_to_cart dans le fichier CartHandler.py . On peut en quelques lignes ajouter un produit au pannier d'un utilisateur donné.
+
+<pre>
+from icebergsdk.api import IcebergAPI
+
+def add_to_cart(id,email,first_name,last_name):
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+
+    api_handler = IcebergAPI()
+
+    #Identification 
+    api_handler.sso(email, first_name, last_name)
+
+    #Get cart
+    user_cart = api_handler.Cart.mine()
+
+    #Find product
+    product = api_handler.ProductOffer.find(id)
+   
+    #Add product to cart
+    user_cart.addOffer(product)
+</pre>
+
+Après avoir importé le module Iceberg API, on s'identifie à la place de l'utilisateur avec les identifiants reçus en paramètre (pas besoin du mot de passe), on récupère le pannier, on trouve l'offre associée à l'id du produit, puis, on ajoute l'offre au pannier.
 
 ## Cron.yaml
 
-À chaque fois que la page /checkTweets est sollicitée, un scan des tweets via l'api twitter est fait, nous allons maintenant automatiser cette tâche grâce au programme cron.
+À chaque fois que la page /checkTweets est sollicitée, un scan des tweets via l'api twitter est fait, nous allons maintenant automatiser cette tâche grâce au programme cron, paramétré dans le fichier cron.yaml.
 
-![image](http://s3.postimg.org/sfhpjz01f/analyse_tweets.png)
+<pre>
+cron:
+- description: check new tweets
+  url: /checkTweets
+  schedule: every 5 mins
+</pre>
 
 Il est très facile de configurer ce fichier: nommer la tâche, renseigner l'url du script qui doit être executé puis définir la fréquence, ici les tweets seront donc scannés toutes les 5 minutes.
 
 
 
-
+Notre application est maintenant fonctionnelle, les tweets seront scannés toutes les cinq minutes, le produit identifié ajouté au pannier de l'utilisateur si celui-ci est bien partenaire de l'offre.
 

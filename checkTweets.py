@@ -62,7 +62,6 @@ def analyseTweet(tweet):
 
     # determine if user exists
     users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitter_username) )
-
     for res in users:
         user_exists = True
         user = res
@@ -166,7 +165,6 @@ def getTweet(search_term, periods = 60*60*24):
     return results
 
 class TweeterHandler(webapp2.RequestHandler):
-    #add to cart
     def get(self):
         looking_for = os.environ['hashtag']
         getTweet(looking_for)
