@@ -7,7 +7,7 @@ Le but de ce tutoriel sera de construire un script semblable en python, nous y a
 Nous utiliserons pour cela la plateforme de développement et d'hébergement d'application Google App Engine qui nous simplifiera le travail, notamment pour la gestion de la base de donnée.
 
 
-* Le tutoriel se divisera en trois étapes:
+* Le tutoriel se divisera en trois étapes
     * L'ajout des utilisateurs à la base de donnée (appelée datastore), et l'enregistrement des informations dont nous auront besoin: mail, nom, prénom et pseudonyme twitter. Ces informations nous permettront, de faire le lien entre l'auteur du tweet trouvés et le compte utilisateur sur notre utilisant la technologie Iceberg. Nous pourront ainsi intervenir sur son pannier via l'api Iceberg.
     * Le scan périodique des tweets grâce à l'api twitter, l'identification de l'auteur et du compte Iceberg associé.
     * L'ajout de l'article au pannier de l'utilisateur via l'api Iceberg.
