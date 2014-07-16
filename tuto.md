@@ -1,6 +1,6 @@
 ## Twitter_bot
 
-Si vous n'avez pas entendu parler de \#AmazonCart, c'est une fonctionnalité lancée par amazon permettant aux utilisateurs de twitter d'ajouter un produit à leur panier amazon directement depuis le fil d'actualité twitter, simplement en tweetant #AmazonCart en réponse à un tweet du compte officiel AmazonCart contenant un lien vers un produit amazon.
+Si vous n'avez pas entendu parler de  , c'est une fonctionnalité lancée par amazon permettant aux utilisateurs de twitter d'ajouter un produit à leur panier amazon directement depuis le fil d'actualité twitter, simplement en tweetant #AmazonCart en réponse à un tweet du compte officiel AmazonCart contenant un lien vers un produit amazon.
 
 Le but de ce tutoriel sera de construire un script semblable en python, nous y ajouterons une fonctionnalité permettant aux utilisateurs de déterminer une taille avec le hashtag \#Taille_M par exemple. 
 
@@ -8,13 +8,18 @@ Nous utiliserons pour cela la plateforme de développement et d'hébergement d'a
 
 La première étape consiste à construire le formulaire qui permet aux utilisateurs d'entrer leurs informations (compte twitter et email sont celles qui nous intéressent le plus). Grâce à cette correspondance, nous pourrons identifier l’émetteur du tweet contenant le hashtag #Modizy_Bot et ajouter l'article en question au panier du compte Amazon, Modizy ou autre.
 
-### Prérequis 
+Le tutoriel se divisera en trois étapes:
+*L'ajout des utilisateurs à la base de donnée (appelée datastore), et l'enregistrement des informations dont nous auront besoin: mail, nom, prénom et pseudonyme twitter. Ces informations nous permettront, de faire le lien entre l'auteur du tweet trouvés et le compte utilisateur sur notre utilisant la technologie Iceberg. Nous pourront ainsi intervenir sur son pannier via l'api Iceberg.
+*Le scan périodique des tweets grâce à l'api twitter, l'identification de l'auteur et du compte Iceberg associé.
+*L'ajout de l'article au pannier de l'utilisateur via l'api Iceberg.
 
-Connectez-vous sur le site appengine.google.com, et installez le logiciel googleappenginelauncher sur votre ordinateur, créez une nouvelle application, elle contient par défaut 4 fichiers. Nous n'expliquerons comment créer l'application de A à Z, le projet est récupérable à cette [adresse](https://github.com/Rafkraft/twitter_bot).
+### Prérequis
+
+Connectez-vous sur le site appengine.google.com, et installez le logiciel googleappenginelauncher sur votre ordinateur, créez une nouvelle application, elle contient par défaut 4 fichiers. Nous n'expliquerons pas comment créer l'application de A à Z, le projet est récupérable à cette [adresse](https://github.com/Rafkraft/twitter_bot).
 
 ### Configuration initiale:
 
-Il est tout d'abord nécessaire de configurer votre fichier app.yaml, définissez les trois variables admin_mail, hashtag et website_name, ainsi que les clés de l'api twitter.
+Il est tout d'abord nécessaire de configurer votre fichier app.yaml, définissez les trois variables admin_mail, hashtag et website_name, ainsi que les clés de l'api twitter et la variable PRIVATE_CRYPTO_KEY qui sera utilisée pour vérifier les requêtes POST reçues.
 
 ### Datastore
 
@@ -22,42 +27,66 @@ Nous utiliserons deux tables dans le datastore, la table «User» qui contiendra
 
 Avec google app engine, les tables sont des attributs de l'objet db, on les défini dans le fichier models.py .
 
-## Main.py
+## addUser.py
 
-Comme vous pouvez le voir dans les routes (handlers) c'est le fichier main.py qui est sollicité par défaut, c'est dans ce fichier que nous allons gérer les requêtes du formulaire qui permet aux utilisateurs d'entrer leurs informations dans la base de donnée.
+Comme vous pouvez le voir dans les routes (handlers dans le fichier app.yaml) c'est le fichier main.py qui est sollicité par défaut, cependant c'est dans le fichier addUser.py que nous allons gérer les requêtes POST reçues et ainsi ajouter nos utilisateurs au programme #Modizy_Bot.
 
-La première fonction exécutée au sein de la classe MainHandler est la fonction get() qui va aller chercher et afficher le fichier home.html qui contient le formulaire en question. 
+Dans l'exemple ci-dessous, la requête est envoyée depuis un serveur node en utilisant le module request.js, l'important est quelle contienne les informations suivantes: dans l'ordre:
+    *twitterUsername: Pseudonyme Twitter (la majuscule doit être respectée)
+    *lastName: Nom de famille
+    *firstName: Prénom
+    *mail: Adresse email
+    *date1: Jour de naissance
+    *date2: Mois de naissance
+    *date3: Année de naissance 
+    *message_auth: résultat du hashing en sha1 de la chaîne de caractère toCompose contenant toutes les variables envoyées (de manière à signer la requête)
+    *timestamp: variable de temps
 
-Une fois le formulaire rempli, et le bouton pressé c'est la fonction post qui est sollicitée, elle se divise en trois étapes:
+<code>
+var timestamp = Math.round(+new Date()/1000);
 
-### **\#verify twitter pseudo is not taken**
+var toCompose = [mail, firstName, lastName, twitterUsername, date1, date2, date3, timestamp];
+toCompose = toCompose.join(';');
+var message_auth = crypto.createHmac('sha1', secret_key).update(toCompose).digest('hex');
 
-* Vérification que le pseudonyme n'est pas utilisé:
-    * &nbsp;&nbsp;&nbsp; Si il l'est et que le compte est actif, un message d'erreur est envoyé.
-    * &nbsp;&nbsp;&nbsp; Si il l'est et que le compte est inactif, le compte est activé et les données mises à jour.
+request({
+    uri: "http://twitterbotid.appspot.com/addUser",
+    method: "POST",
+    form: {
+        twitterUsername:XXXX,
+        lastName:XXXX,
+        firstName:XXXX,
+        mail:XXXX,
+        date1:XXX,
+        date2:XXX,
+        date3:XXX,
+        message_auth:XXXX,
+        timestamp:XXXX
+    }
+}, function(error, response, body) {
+    console.log(body);
+});
+</code>
+
+À la réception, c'est la fonction post au sein de la classe addUser qui s'exécute:
+
+### **\#Get variables from post
+
+Les variables sont récupérées, rien d'incroyable jusque là
+
+### **\#Hash data using the secret_key defined in app.yaml
+
+Le hashing est réalisé à nouveau avec les variables récupérées, on fait appel à la variable d'environnement PRIVATE_CRYPTO_KEY, bien gardée dans le fichier app.yaml, puis, on compare la variable obtenue (message_auth) et la variable issue du hashing à l'emission (recieved_crypto), si elles diffèrent, un message d'erreur est envoyé et l'éxecution s'arrête.
+
 
 ### \#verify twitter mail is not taken
 
-* Vérification que le mail n'est pas utilisé:
-    * &nbsp;&nbsp;&nbsp; Si il l'est et que le compte est actif, un message d'erreur est envoyé.
-    * &nbsp;&nbsp;&nbsp; Si il l'est et que le compte est inactif, le compte est activé et les données mises à jour.
+On vérifie que l'adresse mail reçue n'est pas déjà associée à un compte dans le datastore:
+    *Si c'est le cas, les données sont mises à jour et aucun nouveau compte n'est créé.
+    *Si l'adresse mail n'est pas utilisée, un nouveau compte est créé.
 
-### **\#Add user**
+Des messages de confirmation sont envoyés selon l'action réalisée.
 
-* Si ni le mail ni le pseudo n'est utilisé, un nouvel utilisateur est créé.
-
-Un mail de confirmation est envoyé après l'ajout de l'utilisateur, via la fonction sendMail()
-
-## unsubscribe.py
-
-Nous allons nous occuper maintenant du formulaire qui permet à l'utilisateur de se désinscrire.
-En réalité nous désactiveront seulement son compte.
-
-Lorsqu'on demande l'url /unsubscribe, la fonction get dans la classe Unsubscribe est exécutée, elle va récupérer le formulaire unsubscribe.html, comme précédemment. 
-Pour se désinscrire, il suffira de rentrer son pseudonyme twitter.
-Une fois le champ rempli et le bouton pressé on cherche l'entity correspondant au Username twitter et on envoie les messages de confirmation/erreur selon les correspondances qui sont trouvées avec le datastore.
-
-L'utilisateur n'est jamais vraiment désinscrit, son compte est seulement désactivé, l'attribut «Active» passe de True à False.
 
 ## CheckTweets.py
 

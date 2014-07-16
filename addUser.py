@@ -56,12 +56,9 @@ class addUser(webapp2.RequestHandler):
         website_name = os.environ['website_name']
 
         #initialize
-        pseudo_taken = False
         mail_taken = False
 
-
         #Get variables from post
-        secret_key = os.environ['PRIVATE_CRYPTO_KEY']
 
         date1 = self.request.get('date1')
         date2 = self.request.get('date2')
@@ -75,53 +72,43 @@ class addUser(webapp2.RequestHandler):
         timestamp=self.request.get('timestamp')
         recieved_crypto = self.request.get('message_auth')
 
+
+        #Hash data using the secret_key defined in app.yaml
+        secret_key = os.environ['PRIVATE_CRYPTO_KEY']
+
         to_compose = [email, firstName, lastName, twitterUsername, date1, date2, date3, timestamp]
         to_compose = ";".join(str(x) for x in to_compose)
-
         hashobj = hmac.new(str(secret_key), to_compose, digestmod = hashlib.sha1)
         message_auth = hashobj.hexdigest()
 
+        #Compare the received message_auth and the newly generated one
         if recieved_crypto != message_auth:
             raise Exception('ppooo')
         else:
             print "request verified"
 
+        #
         date1 = int(date1)
         date2 = int(date2)
         date3 = int(date3)
-
         now = datetime.datetime(date3, date2, date1)
-
-        #template
-        template = JINJA_ENVIRONMENT.get_template('templates/template.html')
-
+        
         #verify mail is not taken
         mails = db.GqlQuery("SELECT * FROM User WHERE mail ='%s'" %(email,) )
         for res in mails:
             mail_taken = True
             print 'the mail exists'
-            if res.active:
-                print 'profile active' 
-                res.active = True
-                res.twitterUsername = twitterUsername
-                res.lastName = lastName
-                res.firstName = firstName
-                res.timestamp=now
-                res.put()
-                templateVars = { "message" : "The account exists and the infos have been updated"}
-                self.response.write(template.render(templateVars) )
-                return
-            else:
-                print 'profile not active'
-                res.active = True
-                res.twitterUsername = twitterUsername
-                res.lastName = lastName
-                res.firstName = firstName
-                res.timestamp=now
-                res.put()
-                templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
-                self.response.write(template.render(templateVars) )
-                sendMail(email,twitterUsername,firstName,admin_mail,hashtag)
+            res.active = True
+            res.twitterUsername = twitterUsername
+            res.lastName = lastName
+            res.firstName = firstName
+            res.timestamp=now
+            res.put()
+
+            template = JINJA_ENVIRONMENT.get_template('templates/template.html')
+            templateVars = { "message" : "The account exists and the infos have been updated"}
+            self.response.write(template.render(templateVars) )
+            return
 
         #if mail is not taken, create a new user
         if not mail_taken:
@@ -135,22 +122,9 @@ class addUser(webapp2.RequestHandler):
             )
             self.user.put()
 
+            template = JINJA_ENVIRONMENT.get_template('templates/template.html')
             templateVars = { "message" : "you are signed in, you can now use the '%s' functionnality" %(hashtag,) }
             self.response.write(template.render(templateVars) )
-
-            sendMail(email,twitterUsername,firstName,admin_mail,hashtag)
-
-
-def sendMail(email,twitterUsername,firstName,admin_mail,hashtag):
-    message = mail.EmailMessage(sender="Admin <%s>"%(admin_mail,), subject="Inscription")
-    message.to = "%s <%s>"%(twitterUsername,email)
-    message.body = """
-        Hi %s
-
-        Thanks for your subscription, you can now use the %s functionnality, see you soon
-    """ % (firstName,hashtag)
-    message.send()
-
 
 
 app = webapp2.WSGIApplication([
