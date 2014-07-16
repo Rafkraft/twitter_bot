@@ -157,8 +157,6 @@ def confirmations(product_url,user_mail,user_firstName,user_lastName,tweet_id,tw
     )
     operation.put()
 
-
-
 def getTweet(search_term, periods = 60*60*24):
     results = api.search(q=search_term, rpp=periods)
     for tweet in results:
@@ -166,7 +164,6 @@ def getTweet(search_term, periods = 60*60*24):
         analyseTweet(tweet)
 
     return results
-
 
 class TweeterHandler(webapp2.RequestHandler):
     #add to cart
