@@ -46,7 +46,7 @@ class addUser(webapp2.RequestHandler):
     def get(self):
         from tweepy import API
         template = JINJA_ENVIRONMENT.get_template('templates/template.html')
-        templateVars = { "message" : "" }
+        templateVars = { "message" : "Waiting for a POST request" }
         self.response.write(template.render(templateVars) )
 
     def post(self):

@@ -6,7 +6,6 @@ import datetime
 import sys
 import json
 
-
 from google.appengine.api import users
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
