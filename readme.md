@@ -1,6 +1,6 @@
 Rename app_public.yaml to app.yaml
 
-In the freshly renamed app.yaml file, add:
+* In the freshly renamed app.yaml file, add:
     * line 1: your application's name 
     * line 8: the emaillinked to the google account your using
     * line 9: the hashtag you're looking for in the tweet feed
