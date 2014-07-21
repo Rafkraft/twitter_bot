@@ -3,42 +3,18 @@
 
 <link href="style/style.css" rel="stylesheet" type="text/css"> 
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-
-<script>
-$( document ).ready(function() {
-    for (i = 1; i < 32; i++) { 
-        $("#date1").append('<option value="'+i+'">'+i+'</option>');
-    }
-    for (i =1; i < 13; i++) { 
-        $("#date2").append('<option value="'+i+'">'+i+'</option>');
-    }
-    for (i =1900; i < 2015; i++) { 
-        $("#date3").append('<option value="'+i+'">'+i+'</option>');
-    }
-});
-</script>
 
 </head>
 <body>
 <div id="content">
     <p>Twitter Bot</p>
     <p>By Iceberg</p>
-    <form method="post"> 
-        <label>Last Name</label><br><input id="lastName" name="lastName" /><br>
-        <label>First Name</label><br><input id="firstName" name="firstName" /><br>
-        <label>Twitter username</label><br>@<input id="twitterUsername" name="twitterUsername" /><br>
-        <label>Date of birth</label><br>
-         <select name="date1" id="date1">
-        </select> 
-         <select name="date2" id="date2">
-        </select> 
-         <select name="date3" id="date3">
-        </select> <br>
-        <label>Mail adress</label><br><input id="mail" name="mail" /><br>
-        <input type="submit">
-    </form>
-<a href="/unsubscribe">Unsubscribe</a>
+    <div id="text"> 
+    {{message}}
+    If you want to use the Modizy_Bot functionnality, please register on the following website<br>
+    <a target="_blank" href='http://modizyconnectexample.herokuapp.com/'>modizyconnectexample.herokuapp.com</a><br><br>
+    If you want to build something similar upon your Iceberg powered website, the complete projet and a tutorial are available on the <a target="_blank" href="https://github.com/Rafkraft/twitter_bot/blob/masterv2/tuto.md">GitHub Page</a>.
+    </div>
 </div>
 
 

@@ -18,7 +18,8 @@ from google.appengine.ext import db
 
 from models import Operation
 
-from addToCart import addToCart
+from CartHandler import add_to_cart
+
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -39,13 +40,13 @@ api = tweepy.API(auth)
 
 def analyseTweet(tweet):
 
-    #env variables
+    #Env variables
     admin_mail = os.environ['admin_mail']
     hashtag = os.environ['hashtag']
     website_name = os.environ['website_name'] 
     application_name = os.environ['application_name'] 
 
-    # Tweet variables   
+    #Tweet variables   
     date_tweet = tweet.created_at
     twitter_username = tweet._json['user']['screen_name']
     tweet_id = tweet.id
@@ -56,17 +57,17 @@ def analyseTweet(tweet):
 
     user = None
     user_mail = False
+    user_firstName = False
+    user_lastName = False
 
     # determine if user exists
     users = db.GqlQuery("SELECT * FROM User WHERE twitterUsername ='%s'" %(twitter_username) )
-
     for res in users:
-
         user_exists = True
         user = res
         user_mail = res.mail
         user_firstName = res.firstName
-
+        user_lastName = res.lastName
     if not user:
         print "user doesn't exists"
         return
@@ -101,6 +102,22 @@ def analyseTweet(tweet):
             size =  hashtag['text'].split('_')
             size = size[1]
 
+    print "product_id : "
+    print product_id
+    print "user_mail : "
+    print user_mail
+    print "user_firstName : "
+    print user_firstName
+    print "user_lastName : "
+    print user_lastName
+
+    #Passing data to the Iceberg API
+    add_to_cart(product_id,user_mail,user_firstName,user_lastName)
+
+    confirmations(product_url,user_mail,user_firstName,user_lastName,tweet_id,tweet_message,product_id,size,date_tweet,user)
+
+def confirmations(product_url,user_mail,user_firstName,user_lastName,tweet_id,tweet_message,product_id,size,date_tweet,user):
+
     #Confirmation tweet
     if product_url:
         if size:
@@ -112,25 +129,21 @@ def analyseTweet(tweet):
     if not size:
         size='none'
 
-    #obtain today's date
-    today = datetime.datetime.today()
-    print today
-
     #Confirmation mail
-    message = mail.EmailMessage(sender="Admin <%s>"%(admin_mail),
-    subject="%s new command"%(hashtag))
-    message.to = "%s <%s>" %(user_firstName,user_mail)
+    message = mail.EmailMessage(sender="Admin <%s>"%( os.environ['admin_mail'] ),
+    subject="%s new command"%( os.environ['hashtag'] ))
+    message.to = "%s <%s>" %( user_firstName,user_mail )
     message.body = """ Hi %s
     Your tweet has been taken in consideration and added tou your %s Cart
-     """ %(user_firstName, application_name)
+     """ %( user_firstName, os.environ['application_name'] )
     message.send()
     mail_sent = True
 
-    AddFunction=addToCart()
-    AddFunction.add(52,"connect@yahoo.fr", "Florian", "Poullin") 
+    #Obtain today's date
+    today = datetime.datetime.today()
+    print today
 
-
-    #add the operation to the datastore
+    #Add the operation to the datastore
     operation = Operation(
         tweet_id=int(tweet_id),
         tweet_message = tweet_message,
@@ -144,7 +157,6 @@ def analyseTweet(tweet):
     )
     operation.put()
 
-
 def getTweet(search_term, periods = 60*60*24):
     results = api.search(q=search_term, rpp=periods)
     for tweet in results:
@@ -153,9 +165,7 @@ def getTweet(search_term, periods = 60*60*24):
 
     return results
 
-
 class TweeterHandler(webapp2.RequestHandler):
-    #add to cart
     def get(self):
         looking_for = os.environ['hashtag']
         getTweet(looking_for)
