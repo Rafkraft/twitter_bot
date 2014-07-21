@@ -2,7 +2,7 @@
 
 Si vous n'avez pas entendu parler de \#AmazonCart , c'est une fonctionnalité lancée par amazon permettant aux utilisateurs de Twitter d'ajouter un produit à leur panier amazon directement depuis le fil d'actualité, simplement en tweetant #AmazonCart en réponse à un tweet du compte officiel AmazonCart contenant un lien vers un produit amazon.
 
-Le but de ce tutoriel sera de construire une application réalisant ces opérations en python, nous y ajouterons une fonctionnalité permettant aux utilisateurs de déterminer une taille avec le hashtag \#Taille_M par exemple. De plus, nous ne limiterons pas la fonctionnalité à un compte officiel, nous prendrons en compte tous les tweets contenant le hashtag en question. N'importe qui peut partager sur twitter un article et son url (url d'un site utilisant la technologie Iceberg), et les réponses à ce tweet seront prises en compte.
+Le but de ce tutoriel sera de construire une application python réalisant ces opérations, nous y ajouterons une fonctionnalité permettant aux utilisateurs de déterminer une taille avec le hashtag \#Taille_M par exemple. De plus, nous ne limiterons pas la fonctionnalité à un compte officiel, nous prendrons en compte tous les tweets contenant le hashtag en question. N'importe qui peut partager sur twitter un article et son url (url d'un site utilisant la technologie Iceberg), et les réponses à ce tweet seront prises en compte.
 
 Nous utiliserons pour cela la plateforme de développement et d'hébergement d'application Google App Engine qui nous simplifiera le travail, notamment pour la gestion de la base de donnée.
 
