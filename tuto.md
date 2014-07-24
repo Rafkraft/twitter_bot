@@ -41,7 +41,7 @@ Comme vous pouvez le voir dans les routes (handlers dans le fichier app.yaml) c'
     * message_auth: résultat du hashing en sha1 de la chaîne de caractère toCompose contenant toutes les variables envoyées (de manière à signer la requête)
     * timestamp: variable de temps
 
-<pre>
+```javascript
 var timestamp = Math.round(+new Date()/1000);
 
 var toCompose = [mail, firstName, lastName, twitterUsername, date1, date2, date3, timestamp];
@@ -65,7 +65,7 @@ request({
 }, function(error, response, body) {
     console.log(body);
 });
-</pre>
+```
 
 À la réception, c'est la fonction post au sein de la classe addUser qui s'exécute:
 
@@ -94,23 +94,23 @@ C'est le script qui va réaliser des requêtes envers l'api twitter, récupérer
 
 #### Identification auprès de l'api twitter
 
-<pre>
-    ckey =os.environ['ckey']
-    csecret =os.environ['csecret']
-    atoken =os.environ['atoken']
-    asecret =os.environ['asecret']
+```python
+ckey =os.environ['ckey']
+csecret =os.environ['csecret']
+atoken =os.environ['atoken']
+asecret =os.environ['asecret']
 
-    auth=tweepy.OAuthHandler(ckey,csecret)
-    auth.set_access_token(atoken,asecret)
+auth=tweepy.OAuthHandler(ckey,csecret)
+auth.set_access_token(atoken,asecret)
 
-    api = tweepy.API(auth)
-</pre>
+api = tweepy.API(auth)
+```
 
 Pour utiliser l'api twitter, il est nécessaire d'avoir déclaré les clés qui nous identifient auprès de l'api, les variables doivent être déclarée dans le fichier de configuration app.yaml, le script CheckTweets.py ne fait que récupérer les variables d'environnement.
 
 #### Récupération des tweets
 
-<pre>
+```python
 def getTweet(search_term, periods = 60*60*24):
     results = api.search(q=search_term, rpp=periods)
     for tweet in results:
@@ -124,7 +124,7 @@ class TweeterHandler(webapp2.RequestHandler):
         looking_for = os.environ['hashtag']
         getTweet(looking_for)
         self.response.write('checking tweets')
-</pre>
+```
 
 La première fonction qui s'exécute est TweetHandler, qui récupère le hashtag à chercher parmi le fil de tweets, et exécute la fonction getTweets.
 
@@ -170,7 +170,7 @@ On ajoute l'opération dans le datastore, de manière à ce qu'elle ne soit pas 
 
 Nous passons maintenant à l'utilisation de l'API python Iceberg, solicitée par la fonction add_to_cart dans le fichier CartHandler.py . On peut en quelques lignes ajouter un produit au pannier d'un utilisateur donné.
 
-<pre>
+```python
 from icebergsdk.api import IcebergAPI
 
 def add_to_cart(id,email,first_name,last_name):
@@ -190,7 +190,7 @@ def add_to_cart(id,email,first_name,last_name):
    
     #Add product to cart
     user_cart.addOffer(product)
-</pre>
+```
 
 Après avoir importé le module Iceberg API, on s'identifie à la place de l'utilisateur avec les identifiants reçus en paramètre (pas besoin du mot de passe), on récupère le pannier, on trouve l'offre associée à l'id du produit, puis, on ajoute l'offre au pannier.
 
@@ -198,12 +198,12 @@ Après avoir importé le module Iceberg API, on s'identifie à la place de l'uti
 
 À chaque fois que la page /checkTweets est sollicitée, un scan des tweets via l'api twitter est fait, nous allons maintenant automatiser cette tâche grâce au programme cron, paramétré dans le fichier cron.yaml.
 
-<pre>
+```python
 cron:
 - description: check new tweets
   url: /checkTweets
   schedule: every 5 mins
-</pre>
+```
 
 Il est très facile de configurer ce fichier: nommer la tâche, renseigner l'url du script qui doit être executé puis définir la fréquence, ici les tweets seront donc scannés toutes les 5 minutes.
 
