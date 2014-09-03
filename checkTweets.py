@@ -162,7 +162,7 @@ def getTweet(search_term, periods = 60*60*24):
     for tweet in results:
         print '1 tweet found'
         analyseTweet(tweet)
-
+        
     return results
 
 class TweeterHandler(webapp2.RequestHandler):
