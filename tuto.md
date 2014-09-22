@@ -1,24 +1,26 @@
 ### Twitter_bot
 
-Si vous n'avez pas entendu parler de \#AmazonCart , c'est une fonctionnalité lancée par amazon permettant aux utilisateurs de Twitter d'ajouter un produit à leur panier amazon directement depuis le fil d'actualité, simplement en tweetant #AmazonCart en réponse à un tweet du compte officiel AmazonCart contenant un lien vers un produit amazon.
+\#AmazonCart est une fonctionnalité lancée par amazon permettant aux utilisateurs de Twitter d'ajouter un produit à leur panier amazon directement depuis le fil d'actualité, simplement en tweetant #AmazonCart en réponse à un tweet du compte officiel AmazonCart contenant un lien vers un produit amazon.
 
 Le but de ce tutoriel sera de construire une application python réalisant ces opérations, nous y ajouterons une fonctionnalité permettant aux utilisateurs de déterminer une taille avec le hashtag \#Taille_M par exemple. De plus, nous ne limiterons pas la fonctionnalité à un compte officiel, nous prendrons en compte tous les tweets contenant le hashtag en question. N'importe qui peut partager sur twitter un article et son url (url d'un site utilisant la technologie Iceberg), et les réponses à ce tweet seront prises en compte.
 
-Nous utiliserons pour cela la plateforme de développement et d'hébergement d'application Google App Engine qui nous simplifiera le travail, notamment pour la gestion de la base de donnée.
+L'application a été développée en Python. Nous avons utilisé pour cela d'une part la plateforme de développement et d'hébergement d'application Google App Engine qui nous simplifiera le travail, notamment pour la gestion de la base de donnée, et l'api Iceberg qui va nous permettre d'interagir avec les panniers des utilisateurs, en l'occurence d'ajouter un article au pannier.
+
+Une telle fonctionnalité peut être développée autour de n'importe quel site lié à une application Iceberg. L'application GAE(Google App Engine) dont le fonctionnement sera expliqué n'est pas incorporée à la plateforme liée à Iceberg, elle est hébergée sur les serveurs de google, la communication entre les deux plateformes s'effectue à distance, elle se fait via des requêtes http distantes.
 
 
 * Le tutoriel se divisera en trois étapes
-    * L'ajout des utilisateurs à la base de donnée (appelée datastore), et l'enregistrement des informations dont nous auront besoin: mail, nom, prénom et pseudonyme twitter. Ces informations nous permettront, de faire le lien entre l'auteur du tweet trouvés et le compte utilisateur sur site notre utilisant la technologie Iceberg. Nous pourront ainsi intervenir sur son pannier via l'api Iceberg.
+    * L'ajout des utilisateurs à la base de donnée utilisée par l'environnement GAE (appelée datastore), et l'enregistrement des informations dont nous auront besoin: mail, nom, prénom et pseudonyme twitter. Ces informations nous permettront, de faire le lien entre l'auteur du tweet trouvés et le compte utilisateur sur notre site utilisant la technologie Iceberg. Nous pourront ainsi intervenir sur son pannier via l'api Iceberg.
     * Le scan périodique des tweets grâce à l'api twitter, l'identification de l'auteur et du compte Iceberg associé.
     * L'ajout de l'article au pannier de l'utilisateur via l'api Iceberg.
 
 #### Prérequis
 
-Connectez-vous sur le site appengine.google.com, et installez le logiciel googleappenginelauncher sur votre ordinateur, créez une nouvelle application, elle contient par défaut 4 fichiers. Nous n'expliquerons pas comment créer l'application de A à Z, le projet est récupérable à cette [adresse](https://github.com/Rafkraft/twitter_bot/tree/masterv2).
+Comme cela a été expliqué, cette application utilise le programme Google App Engine. Il vous faut tout d'abord l'installer. Connectez-vous sur le site appengine.google.com, et installez le logiciel googleappenginelauncher sur votre ordinateur, créez une nouvelle application, elle contient par défaut 4 fichiers. Nous n'expliquerons pas comment créer l'application de A à Z, le projet est récupérable à cette [adresse](https://github.com/Rafkraft/twitter_bot/tree/masterv2).
 
 #### Configuration initiale:
 
-Il est tout d'abord nécessaire de configurer votre fichier app.yaml, définissez les trois variables admin_mail, hashtag et website_name, ainsi que les clés de l'api twitter et la variable PRIVATE_CRYPTO_KEY qui sera utilisée pour vérifier les requêtes POST reçues.
+Il est tout d'abord nécessaire de configurer votre fichier app.yaml, définissez les trois variables admin_mail, hashtag et website_name, ainsi que les clés de l'api twitter et la variable PRIVATE_CRYPTO_KEY (mélangez aléatoirement lettres et chiffres pour optimiser la sécurité) qui sera utilisée pour vérifier les requêtes POST reçues.
 
 #### Datastore
 
@@ -35,9 +37,9 @@ Comme vous pouvez le voir dans les routes (handlers dans le fichier app.yaml) c'
     * lastName: Nom de famille
     * firstName: Prénom
     * mail: Adresse email
-    * date1: Jour de naissance
-    * date2: Mois de naissance
-    * date3: Année de naissance 
+    * date1: Jour de naissance (JJ)
+    * date2: Mois de naissance (MM)
+    * date3: Année de naissance (YYYY)
     * message_auth: résultat du hashing en sha1 de la chaîne de caractère toCompose contenant toutes les variables envoyées (de manière à signer la requête)
     * timestamp: variable de temps
 
@@ -66,8 +68,9 @@ request({
     console.log(body);
 });
 ```
+Ici une requête pour ajouter un utilisatuer envoyée depuis un serveur Node JS.
 
-À la réception, c'est la fonction post au sein de la classe addUser qui s'exécute:
+À la réception, c'est la fonction post au sein de la classe addUser (dans le fichier addUser.py) qui s'exécute:
 
 #### \#Get variables from post
 

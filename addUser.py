@@ -103,6 +103,7 @@ class addUser(webapp2.RequestHandler):
             res.firstName = firstName
             res.timestamp=now
             res.put()
+            print 'infos about the user have been updated'
 
             template = JINJA_ENVIRONMENT.get_template('templates/template.html')
             templateVars = { "message" : "The account exists and the infos have been updated"}

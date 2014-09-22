@@ -4,6 +4,7 @@ runtime: python27
 api_version: 1
 threadsafe: yes
 
+# Global env variables
 env_variables:
   admin_mail: 'yourmail'
   hashtag: 'hashtag'
@@ -14,9 +15,8 @@ env_variables:
   asecret: 'XXXX'
   PRIVATE_CRYPTO_KEY: 'XXXXXXX'
 
-
+# Routes
 handlers:
-
 - url: /CartHandler
   script: CartHandler.app
 

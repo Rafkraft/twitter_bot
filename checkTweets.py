@@ -113,7 +113,6 @@ def analyseTweet(tweet):
 
     #Passing data to the Iceberg API
     add_to_cart(product_id,user_mail,user_firstName,user_lastName)
-
     confirmations(product_url,user_mail,user_firstName,user_lastName,tweet_id,tweet_message,product_id,size,date_tweet,user)
 
 def confirmations(product_url,user_mail,user_firstName,user_lastName,tweet_id,tweet_message,product_id,size,date_tweet,user):

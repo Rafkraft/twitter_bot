@@ -19,23 +19,30 @@ def add_to_cart(id,email,first_name,last_name):
     import logging
     logging.basicConfig(level=logging.DEBUG)
 
+    print 'addToCart'
 
     api_handler = IcebergAPI()
 
     #Identification 
     api_handler.sso(email, first_name, last_name)
+    print 'connected'
 
     #Get cart
     user_cart = api_handler.Cart.mine()
 
     #Find product
     product = api_handler.ProductOffer.find(id)
+
+    print 'product'
+    print product
    
     #Add product to cart
     user_cart.addOffer(product)
 
-    
     user_cart = api_handler.Cart.mine()   
+
+    print user_cart
+
 
 app = webapp2.WSGIApplication([
     ('/CartHandler', add_to_cart)
