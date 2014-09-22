@@ -96,6 +96,10 @@ def analyseTweet(tweet):
     product_id = product_url.split('/')[-2]
 
     #Obtain size id there is one
+
+    # ===============
+    # Change the T and t to an other letter, for example S and s in order to listen to "Size_M"
+    # ===============
     size = False
     for hashtag in tweet.entities['hashtags']:
         if hashtag['text'][0] == 'T' or hashtag['text'][0] == 't':
