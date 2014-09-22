@@ -4,6 +4,8 @@ Iceberg Twitter Bot is a Google App Engine driven application allowing you to ad
 
 People who are part of the operation will be able to add items to their iceberg-linked website directly through the twitter feed, simply by responding to an admin account who will share new products pictures and url through twitter. This application is written in python, it listens to the twitter feed for a specific hashtag, #Modizy_Bot for example, when a tweet containing this hashtag is found, the username is compared to the datastore's usernames (datastore is google app engine's database), and if it is found it means that the user is part of the operation, product ID is recovered from the tweet the user responded to. And the product is added to its iceberg cart through the iceberg Python API.
 
+### Configuration
+
 #### copy files
 
 All these files have to be copied in a main Google App Engine root folder, and the default files can be erased.
