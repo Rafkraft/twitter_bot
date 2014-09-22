@@ -26,7 +26,7 @@ Your application, once deployed on google's servers, should be running and worki
 
 #### add users
 
-Your application is working, but no user have been added to your application, in order to add users to the program.
+Your application is working, but no user have been added to your application, in order to add users to the program, you'll have to send POST requests to the /addUser route.
 
 * You'll have to send POST requests to the /addUser route, this request must contain 7 precise fields:
     * twitterUsername: Twitter username (case sensitive)
