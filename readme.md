@@ -14,10 +14,26 @@ Rename app_public.yaml to app.yaml
 
 * In the freshly renamed app.yaml file, add:
     * line 1: your google app engine application's name 
-    * line 8: the email of the google account your using with the current GAE Appllication
+    * line 8: the email of the google account you are using with the current GAE Appllication
     * line 9: the hashtag you're going to listen to in the twitter feed
     * line 10: your website name
     * line 11->14 : your twitter api access keys (you have to have a verified twitter account to obtain these keys)
     * line 15 : a random secret key you'll be using to sign your POST requests
 
 Your application, once deployed on google's servers, should be running and working.
+
+#### add users
+
+Your application is working, but no user have been added to your application, in order to add users to the program, you'll have to send POST requests to the /addUser route, this request must contain 7 precise fields:
+    * twitterUsername: Twitter username (case sensitive)
+    * lastName: last name
+    * firstName: first name
+    * mail: email adress
+    * date1: day of birth (JJ)
+    * date2: month of birth (MM)
+    * date3: year of birth (YYYY)
+    * message_auth: result of the sha1 hashing of all these variables, so the request is signed and secured, in our case, the variables are joined with a comma in a big string.
+    * timestamp: time variable (not currently used)
+
+This request method must be used to add users to the application, the main identifier for a user is the mail. It means that if a request is sent, and the mail is already taken, the twitter username will be updated.
+
