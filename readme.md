@@ -2,6 +2,8 @@
 
 ![Img](http://twitterbotid.appspot.com/style/TBBI.png)
 
+[Iceberg Marketplace](http://www.iceberg-marketplace.com)
+
 **Iceberg Twitter Bot** is a **Google App Engine** driven application allowing you to add a social e-commerce related functionnality to your Iceberg-linked platform. 
 
 People who are part of the operation will be able to add items to their iceberg-linked website directly through the twitter feed, simply by responding to an admin account who will share new products pictures and url through twitter. This application is written in python, it listens to the twitter feed for a specific hashtag, **#Modizy_Bot** for example, when a tweet containing this hashtag is found, the username is compared to the datastore's usernames (datastore is google app engine's database), and if it is found it means that the user is part of the operation, product ID is recovered from the tweet the user responded to. And the product is added to its Iceberg cart through the iceberg Python API.
@@ -41,5 +43,5 @@ Your application is working, but no user have been added to your application, in
     * message_auth: result of the sha1 hashing of all these variables, so the request is signed and secured, in our case, the variables are joined with a comma in a big string.
     * timestamp: time variable (not currently used)
 
-This request method must be used to add users to the application, the main identifier for a user is the mail. It means that if a request is sent, and the mail is already taken, the twitter username will be updated.
+This request method must be used to add users to the application, the main identifier for a user is the mail. It means that if a request is sent, and the mail is already taken, no user will be created, the twitter username and all the informations will be updated.
 
