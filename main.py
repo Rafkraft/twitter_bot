@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+import logging
 import webapp2
 import os
 import urllib
@@ -32,6 +32,8 @@ from models import User
 if 'libs' not in sys.path:
     sys.path[0:0] = ['libs']
 
+logging.getLogger().setLevel(logging.DEBUG)
+
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -47,3 +49,6 @@ class MainHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
 ], debug=True)
+
+
+

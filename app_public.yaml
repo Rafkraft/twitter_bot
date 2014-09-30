@@ -14,6 +14,8 @@ env_variables:
   atoken: 'XXXXXX'
   asecret: 'XXXX'
   PRIVATE_CRYPTO_KEY: 'XXXXXXX'
+  ICEBERG_APPLICATION_NAMESPACE: 'raf_app'
+  ICEBERG_APPLICATION_SECRET_KEY: '19776da6-3c73-4dcd-aad7-75937d421eff'
 
 # Routes
 handlers:

@@ -35,35 +35,24 @@ class IcebergNotAuthorized(IcebergError):
 class IcebergReadOnlyError(IcebergError):
     pass
 
-class IcebergMissingSsoData(IcebergError):
-    pass
-
 # API
 class IcebergAPIError(IcebergError):
-    def __init__(self, response, url = None):
+    def __init__(self, response):
         self.status_code = response.status_code
         self.error_codes = []
         self.message = ''
-        self.url = url
 
         try:
             self.data = response.json()
         except:
             self.data = response
-        else:            
+        else:
             if 'errors' in self.data:
                 for error in self.data['errors']:
-                    if isinstance(error, basestring):
-                        self.message += error
-                    else:
-                        if 'code' in error:
-                            self.error_codes.append(error['code'])
-                        self.message += error['msg']
+                    self.error_codes.append(error['code'])
+                    self.message += error['msg']
             if 'error' in self.data:
-                if isinstance(self.data['error'], basestring):
-                    self.message += self.data['error']
-                else:
-                    self.message += self.data['error']['msg']
+                self.message += self.data['error']['msg']
 
         Exception.__init__(self, self.message)
         
@@ -72,15 +61,12 @@ class IcebergAPIError(IcebergError):
             message = self.message
         else:
             message = self.data
-        return "Error in %s! %s : %s: %s" % (self.url, self.status_code, self.error_codes, message)
+        return "Error! %s : %s: %s" % (self.status_code, self.error_codes, message)
 
 class IcebergServerError(IcebergAPIError):
     pass
 
 class IcebergClientError(IcebergAPIError):
-    pass
-
-class IcebergClientUnauthorizedError(IcebergError):
     pass
 
 

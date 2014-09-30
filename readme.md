@@ -20,11 +20,13 @@ Rename app_public.yaml to app.yaml
 
 * In the freshly renamed app.yaml file, add:
     * line 1: your google app engine application's name 
-    * line 8: the email of the google account you are using with the current GAE Appllication
-    * line 9: the hashtag you're going to listen to in the twitter feed
-    * line 10: your website name
-    * line 11->14 : your twitter api access keys (you have to have a verified twitter account to obtain these keys)
-    * line 15 : a random secret key you'll be using to sign your POST requests
+    * line 9: the email of the google account you are using with the current GAE Appllication
+    * line 10: the hashtag you're going to listen to in the twitter feed
+    * line 11: your website name this must be contained in the product url shared on twitter, modizy.com for example
+    * line 12->15 : your twitter api access keys (you have to have a verified twitter account to obtain these keys)
+    * line 16 : a random secret key you'll be using to sign your POST requests
+    * line 17 ICEBERG_APPLICATION_NAMESPACE : the namespace of your application, so the Iceberg api will know where to look for products
+    * line 18 ICEBERG_APPLICATION_SECRET_KEY : Your Iceberg Application's secret key
 
 Your application, once deployed on google's servers, should be running and working.
 

@@ -44,7 +44,6 @@ def analyseTweet(tweet):
     admin_mail = os.environ['admin_mail']
     hashtag = os.environ['hashtag']
     website_name = os.environ['website_name'] 
-    application_name = os.environ['application_name'] 
 
     #Tweet variables   
     date_tweet = tweet.created_at
@@ -91,7 +90,7 @@ def analyseTweet(tweet):
     parent_status = api.get_status(str(parent_id))
     for url in parent_status.entities['urls']:
         link = url['expanded_url']
-        if application_name in link:
+        if website_name in link:
             product_url = link
     product_id = product_url.split('/')[-2]
 
@@ -116,11 +115,12 @@ def analyseTweet(tweet):
     print user_lastName
 
     #Passing data to the Iceberg API
-    add_to_cart(product_id,user_mail,user_firstName,user_lastName)
+    add_to_cart(product_id,user_mail,user_firstName,user_lastName,size)
     confirmations(product_url,user_mail,user_firstName,user_lastName,tweet_id,tweet_message,product_id,size,date_tweet,user)
 
 def confirmations(product_url,user_mail,user_firstName,user_lastName,tweet_id,tweet_message,product_id,size,date_tweet,user):
 
+    print "confirmation function"
     #Confirmation tweet
     if product_url:
         if size:
@@ -138,13 +138,12 @@ def confirmations(product_url,user_mail,user_firstName,user_lastName,tweet_id,tw
     message.to = "%s <%s>" %( user_firstName,user_mail )
     message.body = """ Hi %s
     Your tweet has been taken in consideration and added tou your %s Cart
-     """ %( user_firstName, os.environ['application_name'] )
+     """ %( user_firstName, os.environ['website_name'] )
     message.send()
     mail_sent = True
 
     #Obtain today's date
     today = datetime.datetime.today()
-    print today
 
     #Add the operation to the datastore
     operation = Operation(

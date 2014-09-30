@@ -1,17 +1,33 @@
 # -*- coding: utf-8 -*-
 
-import warnings, sys, json, logging
+import warnings, sys, json
 import weakref  # Means that if there is no other value, it will be removed
 
-logger = logging.getLogger('icebergsdk.resource')
+# from stripe import api_requestor, error, util
+
+
+# def convert_to_stripe_object(resp, api_key):
+#     types = {'charge': Charge, 'customer': Customer,
+#              'invoice': Invoice, 'invoiceitem': InvoiceItem,
+#              'plan': Plan, 'coupon': Coupon, 'token': Token, 'event': Event,
+#              'transfer': Transfer, 'list': ListObject, 'recipient': Recipient,
+#              'card': Card, 'application_fee': ApplicationFee,
+#              'subscription': Subscription}
+
+#     if isinstance(resp, list):
+#         return [convert_to_stripe_object(i, api_key) for i in resp]
+#     elif isinstance(resp, dict) and not isinstance(resp, StripeObject):
+#         resp = resp.copy()
+#         klass_name = resp.get('object')
+#         if isinstance(klass_name, basestring):
+#             klass = types.get(klass_name, StripeObject)
+#         else:
+#             klass = StripeObject
+#         return klass.construct_from(resp, api_key)
+#     else:
+#         return resp
 
 from icebergsdk.exceptions import IcebergNoHandlerError, IcebergReadOnlyError
-
-
-"""
-Work in progress...
-Lot's of stuff to rewrite/remove/add
-"""
 
 
 class IcebergObject(dict):
@@ -26,7 +42,7 @@ class IcebergObject(dict):
         self._retrieve_params = params
         self._previous_metadata = None
 
-        object.__setattr__(self, '_handler', handler)
+        object.__setattr__(self, 'handler', handler)
 
     def __setattr__(self, k, v):
         if k[0] == '_':
@@ -53,7 +69,7 @@ class IcebergObject(dict):
 
         try:
             return self[k]
-        except KeyError as err:
+        except KeyError, err:
             raise AttributeError(*err.args)
 
     def __setitem__(self, k, v):
@@ -75,7 +91,7 @@ class IcebergObject(dict):
     def __getitem__(self, k):
         try:
             return super(IcebergObject, self).__getitem__(k)
-        except KeyError as err:
+        except KeyError, err:
             if k in self._transient_values:
                 raise KeyError(
                     "%r.  HINT: The %r attribute was set in the past."
@@ -93,13 +109,10 @@ class IcebergObject(dict):
             "To unset a property, set it to None.")
 
     def request(self, *args, **kwargs):
-        return self.__class__._handler.request(*args, **kwargs)
+        return self.__class__.handler.request(*args, **kwargs)
 
     def get_list(self, resource, **kwargs):
-        """
-        Return a list of Resource Objects
-        """
-        data = self.__class__._handler.get_list(resource, **kwargs)
+        data = self.__class__.handler.get_list(resource, **kwargs)
 
         res = []
         for element in data:
@@ -107,36 +120,7 @@ class IcebergObject(dict):
 
         return res
 
-    def to_JSON(self):
-        return json.dumps(self.as_dict())
-
-    def as_dict(self, max_depth=2):
-        params = {}
-        if max_depth <= 0:
-            return {}
-        for k in self.__dict__:
-            if k.startswith('_'):
-                continue
-
-            v = getattr(self, k)
-
-            if isinstance(v, IcebergObject):
-                params[k] = v.as_dict(max_depth=max_depth-1)
-            elif type(v) == list:
-                res = []
-                for u in v:
-                    if isinstance(u, IcebergObject):
-                        res.append(u.as_dict(max_depth=max_depth-1))
-                    elif hasattr(u, 'as_dict'):
-                        res.append(u.as_dict())
-                    else:
-                        res.append(u)
-                params[k] = res
-            else:
-                params[k] = v if v is not None else ""
-        return params
-
-    def __repr__(self):        
+    def __repr__(self):
         ident_parts = [type(self).__name__]
 
         if isinstance(self.get('object'), basestring):
@@ -158,7 +142,7 @@ class IcebergObject(dict):
 
     @classmethod
     def set_handler(cls, handler):
-        cls._handler = handler
+        cls.handler = handler
         return cls
 
     def to_dict(self):
@@ -179,54 +163,18 @@ class IcebergObject(dict):
     def has_changed(self):
         return len(self._unsaved_values) > 0
 
-    @classmethod
-    def build_resource_uri(cls, options):
-        """
-        Generate a resource URI from a class
-
-        Should work like:
-            build_resource_uri(Product, {id:2}) -> https://api.iceberg.technology/v1/product/2/
-        """
-        raise NotImplementedError()
-
-    def get_resource_uri(self):
-        if self.is_new():
-            raise Exception('Missing id for resource %s' % self.endpoint)
-
-        if not hasattr(self, 'resource_uri'):
-            self.resource_uri = "/v1/%s/%s/" % (self.endpoint, self.id)
-        return self.resource_uri
-
     def _load_attributes_from_response(self, **response):
-        """
-        Loads attributes
-        If the data has a nested object with a resource_uri, try to math an existing object
-        """
         for key, value in response.iteritems():
-            if type(value) == list:
-                res = []
-                for elem in value:
-                    if type(elem)==dict and 'resource_uri' in elem: # Try to match a relation
-                        try:
-                            from icebergsdk.resources import get_class_from_resource_uri
-                            obj_cls = get_class_from_resource_uri(elem['resource_uri'])
-                            res.append(obj_cls.findOrCreate(elem))
-                        except Exception:
-                            logger.exception('Cant parse resource')
-                    else:
-                        res.append(elem)
-                        
-                self.__dict__[key] = res
-
-            elif type(value) == dict:
+            if type(value) == dict:
                 if 'resource_uri' in value: # Try to match a relation
+                    from icebergsdk.resources import get_class_from_resource_uri
+
                     try:
-                        from icebergsdk.resources import get_class_from_resource_uri
                         obj_cls = get_class_from_resource_uri(value['resource_uri'])
                         self.__dict__[key] = obj_cls.findOrCreate(value)
                     except:
                         pass
-                elif 'id' in value: # Fall back
+                elif 'id' in value:
                     self.__dict__[key] = value['id']
             else:
                 self.__dict__[key] = value
@@ -236,57 +184,42 @@ class IcebergObject(dict):
     @classmethod
     def findOrCreate(cls, data):
         """
-        Take a dict and return an corresponding Iceberg resource object.
+        To Rewrite using resource_uri
 
-        Check in __objects_store for reuse of existing object
+        Bug with "type"... 
 
-        Example:
-            data: {
-                "id": 1,
-                "resource_uri": "/v1/user/1/"
-                ...
-            }
 
-            Will return an User object
+        NOT GOOD
         """
-
-        from icebergsdk.resources import get_class_from_resource_uri
-
-        try:
-            obj_cls = get_class_from_resource_uri(data['resource_uri'])
-        except:
-            obj = cls()
-        else:
-            data_type = obj_cls.endpoint
-
-            if not data_type in cls.__objects_store: # New type collectore
-                cls.__objects_store[data_type] = weakref.WeakValueDictionary()
-                obj = obj_cls()
-                cls.__objects_store[data_type][str(data['id'])] = obj
+        if "type" in data: # If we know the object type
+            if not data["type"] in cls.__objects_store: # New type collectore
+                cls.__objects_store[data["type"]] = weakref.WeakValueDictionary()
+                obj = cls()
+                cls.__objects_store[data["type"]][str(data['id'])] = obj
             else:
-                if str(data['id']) in cls.__objects_store[data_type]:
-                    obj = cls.__objects_store[data_type][str(data['id'])]
+                if str(data['id']) in cls.__objects_store[data["type"]]:
+                    obj = cls.__objects_store[data["type"]][str(data['id'])]
                 else:
-                    obj = obj_cls()
-                    cls.__objects_store[data_type][str(data['id'])] = obj
-
+                    obj = cls()
+                    cls.__objects_store[data["type"]][str(data['id'])] = obj
+        else:
+            obj = cls()
         return obj._load_attributes_from_response(**data)
 
     @classmethod
     def find(cls, object_id):
-        if not cls._handler:
+        if not cls.handler:
             raise IcebergNoHandlerError()
 
-        data = cls._handler.get_element(cls.endpoint, object_id)
+        data = cls.handler.get_element(cls.endpoint, object_id)
         return cls.findOrCreate(data)
-
 
     @classmethod
     def search(cls, args = None):
-        if not cls._handler:
+        if not cls.handler:
             raise IcebergNoHandlerError()
 
-        data = cls._handler.request("%s/" % cls.endpoint, args)
+        data = cls.handler.request("%s/" % cls.endpoint, args)
         res = []
         for element in data['objects']:
             res.append(cls.findOrCreate(element))
@@ -319,15 +252,15 @@ class IcebergObject(dict):
         """
         Resets the model's state from the server
         """
-        if not self.__class__._handler:
+        if not self.__class__.handler:
             raise IcebergNoHandlerError()
 
-        data = self.__class__._handler.request(self.resource_uri)
+        data = self.__class__.handler.request(self.resource_uri)
 
         return self._load_attributes_from_response(**data)
 
     def delete(self):
-        raise IcebergReadOnlyError()
+        return self
 
     def save(self):
         raise IcebergReadOnlyError()
@@ -344,22 +277,13 @@ class UpdateableIcebergObject(IcebergObject):
                 v = getattr(obj, k)
 
                 if isinstance(v, IcebergObject):
-                    params[k] = v.get_resource_uri()
-                elif type(v) == list:
-
-                    res = []
-                    for elem in v:
-                        if isinstance(elem, IcebergObject):
-                            res.append(elem.get_resource_uri())
-                        else:
-                            res.append(elem)
-                    params[k] = res
+                    params[k] = v.resource_uri
                 else:
                     params[k] = v if v is not None else ""
         return params
 
     def save(self):
-        if not self.__class__._handler:
+        if not self.__class__.handler:
             raise IcebergNoHandlerError()
 
         if self.is_new():
@@ -369,24 +293,12 @@ class UpdateableIcebergObject(IcebergObject):
             method = "PUT"
             path = self.resource_uri
 
-        res = self.__class__._handler.request(path, post_args = self.serialize(self), method = method)
+        res = self.__class__.handler.request(path, post_args = self.serialize(self), method = method)
         self._load_attributes_from_response(**res)
 
         # Clean
         self._unsaved_values = set()
 
         return self
-
-    def delete(self, handler = None):
-        if not handler:
-            if not self.__class__._handler:
-                raise IcebergNoHandlerError()
-
-            handler = self.__class__._handler
-                
-        handler.request(self.resource_uri, post_args = {}, method = "DELETE")
-        # Clean
-        self.__dict__ = {}
-        self._unsaved_values = set()
 
 
