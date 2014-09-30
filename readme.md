@@ -50,6 +50,8 @@ This request method must be used to add users to the application, the main ident
 #### A few advices
 
 Now your application should be running, checking tweets containing the hashtag you defined in the app.yaml file every 5 minutes and adding product to the user cart.
+
 In order to recover the product id from the url, you'll probably have to proceed differently, the function that recovers the id from the url is in the checkTweets.py file line 87, a problem might occur at this step.
+
 In the checkTweets.py file line 101, you may also want to change the first letter of the hashtag that should contain variation information. In our example, if the first letter is t, this hashtag is considered as "#taille_M" formatted, and the "M" variation is recovered from it. You can change the T and t line 104 to S and s for example, if you want to retrive the variation from "#size_M" or "#Size_M"
 
