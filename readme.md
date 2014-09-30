@@ -25,8 +25,8 @@ Rename app_public.yaml to app.yaml
     * line 11: your website name this must be contained in the product url shared on twitter, modizy.com for example
     * line 12->15 : your twitter api access keys (you have to have a verified twitter account to obtain these keys)
     * line 16 : a random secret key you'll be using to sign your POST requests
-    * line 17 _ICEBERG_APPLICATION_NAMESPACE_ : the namespace of your application, so the Iceberg api will know where to look for products
-    * line 18 _ICEBERG_APPLICATION_SECRET_KEY_ : Your Iceberg Application's secret key
+    * line 17 **ICEBERG_APPLICATION_NAMESPACE** : the namespace of your application, so the Iceberg api will know where to look for products
+    * line 18 **ICEBERG_APPLICATION_SECRET_KEY** : Your Iceberg Application's secret key
 
 Your application, once deployed on google's servers, should be running and working.
 
@@ -35,15 +35,15 @@ Your application, once deployed on google's servers, should be running and worki
 Your application is working, but no user have been added to your application, in order to add users to the program, you'll have to send POST requests to the /addUser route.
 
 * You'll have to send POST requests to the /addUser route, this request must contain 7 precise fields:
-    * _twitterUsername_: Twitter username (case sensitive)
-    * _lastName_: last name
-    * _firstName_: first name
-    * _mail_: email adress
-    * _date1_: day of birth (JJ)
-    * _date2_: month of birth (MM)
-    * _date3_: year of birth (YYYY)
-    * _message_auth_: result of the sha1 hashing of all these variables, so the request is signed and secured, in our case, the variables are joined with a comma in a big string.
-    * _timestamp_: time variable (not currently used)
+    * **twitterUsername**: Twitter username (case sensitive)
+    * **lastName**: last name
+    * **firstName**: first name
+    * **mail**: email adress
+    * **date1**: day of birth (JJ)
+    * **date2**: month of birth (MM)
+    * **date3**: year of birth (YYYY)
+    * **message_auth**: result of the sha1 hashing of all these variables, so the request is signed and secured, in our case, the variables are joined with a comma in a big string.
+    * **timestamp**: time variable (not currently used)
 
 This request method must be used to add users to the application, the main identifier for a user is the mail. It means that if a request is sent, and the mail is already taken, no user will be created, the twitter username and all the informations will be updated.
 
